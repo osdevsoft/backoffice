@@ -1,0 +1,82 @@
+{% set display_finder = false %}
+
+<div id="finder">
+    <a data-qa="{{ locale['Search'] }}" href="#" id="finder_toggler">&#x1F50D; {{ locale['Search'] }}</a>
+    <form action="/{{ backoffice_folder }}/{{ model }}/" method="get" style="display:none" class="dashed-group">
+        <fieldset>
+        <table>
+
+        {% for field in model_viewable_fields %}
+
+            {% if '.' in field %}
+            {# it's a field from a related model #}
+                {% set field_info = field|split(".") %}
+                {% set model_metadata_values = models_metadata[field_info[0]][field_info[1]] %}
+            {% else %}
+                {% set model_metadata_values = models_metadata[model_name][field] %}
+            {% endif %}
+
+            {# field has been searched previously. Get its searched value #}
+            {% if search_fields[field] is iterable %}
+                {% set field_searched_value = search_fields[field].value %}
+            {% else %}
+                {% set field_searched_value = search_fields[field] %}
+            {% endif %}
+
+            {%  if field_searched_value != "" %}
+                {% set display_finder = true %}
+            {% endif %}
+
+            {%  set printed = false %}
+            <tr>
+                <td>{{ field|replace({'.': ' ', '_': " "}) }}</td>
+                <td>
+                {% if 'timestamp' in field_metadata.Type %}
+                    {% set printed = true %}
+                    <input data-qa="{{ field }}" type="text" class="datepicker" placeholder="YYYY-MM-DD" name="search_fields[{{ field }}]" value="{{ field_searched_value }}">
+                {% endif %}
+
+                {#field possible values is defined on its model metadata #}
+                {% if model_metadata_values is not null %}
+                    {% set printed = true %}
+                    <input type="hidden" name="search_fields[{{ field }}][operand]" value="=" />
+                    <select data-qa="{{ field }}" name="search_fields[{{ field }}][value]">
+                        <option></option>
+                        {% for key, value in model_metadata_values['by_id'] %}
+                            <option value="{{ key }}" {% if field_searched_value is same as(key|number_format) %}selected{%endif%}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+
+                {% if not printed %}
+                    <input data-qa="{{ field }}" type="text" name="search_fields[{{ field }}][value]" value="{{ field_searched_value }}">
+                    {% if 'varchar' in field_metadata.Type %}
+                        <input type="hidden" name="search_fields[{{ field }}][operand]" value="LIKE">
+                    {% endif %}
+                {% endif %}
+                <a href="#" data-qa="Clear" style="text-decoration: none" onclick="deleteInputValue(this);">[ Clear ]</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+        </fieldset>
+        <input data-qa="{{ locale['Find'] }}" type="submit" value="{{ locale['Find'] }}!" />
+    </form>
+</div>
+{% block javascripts %}
+    <script>
+        function deleteInputValue(deletor)
+        {
+            $(deletor).siblings('input').val('');
+        }
+
+        $('#finder_toggler').on('click', function() {
+            $($(this).siblings('form')[0]).toggle();
+        })
+
+        {% if display_finder == true %}
+            $('#finder_toggler').trigger('click');
+        {% endif %}
+
+    </script>
+{% endblock %}

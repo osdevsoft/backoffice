@@ -1,0 +1,10 @@
+services:
+    Illuminate\Http\Request:
+        autowire: true
+
+    Osds\Backoffice\Infrastructure\Controllers\BaseController:
+        autowire: true
+
+    Osds\Backoffice\Framework\Symfony\LoginController:
+        autowire: true
+        tags: ['controller.service_arguments']

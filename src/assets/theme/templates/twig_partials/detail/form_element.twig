@@ -1,0 +1,196 @@
+{% set printed = false %}
+{% set referenced_model = null %}
+{% set referenced_field = null %}
+
+{% if field in model_fillable_fields %}
+    {% set is_field_fillable = true %}
+{% else %}
+    {% set is_field_fillable = false %}
+{% endif %}
+
+{% if language is not null
+    and data[field] is not null
+    and data[field] is iterable
+%}
+    {# field has some value #}
+    {# we already know it's multilanguage because we have "language" var set (from form.twig) #}
+    {# maybe it's the first time in here (now we want multilang) so it could not be an array#}
+    {% set field_value = data[field][language] %}
+{% endif %}
+
+{% if '.' in field %}
+    {% set field_value = null %}
+    {#field from a referenced model, split to parse all levels #}
+    {% set referenced_field_data = field|split('.') %}
+
+    {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
+    {% for i in 0..(referenced_field_data|length - 1) %}
+        {# entity or field (we don't know which is it) until we check "i" #}
+        {% set entity_or_field_name = referenced_field_data[i] %}
+        {% if i != (referenced_field_data|length - 1) %}
+            {# it's not the last element => it's an entity #}
+            {% set data = data['relations'][entity_or_field_name]['items'][0] %}
+            {% set referenced_model = entity_or_field_name %}
+        {% else %}
+            {# it's the last element => it's the field => get the value #}
+            {% set field_value = data[entity_or_field_name] %}
+            {% set referenced_field = entity_or_field_name %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if field_value is null %}
+    {% set field_value = data[field] %}
+{% endif %}
+{#display field value #}
+{% if is_field_fillable %}
+    {# value can be modified #}
+
+    {# check if it's a value from a foreign model #}
+    {% if referenced_model is not null %}
+        {% set printed = true %}
+
+        <select style="width:100%" data-qa="{{ referenced_model ~ '_id' }}" name="{{ referenced_model ~ '_id' }}"
+                {% if field_info is not null and field_info.type == "select-finder" %}
+                    data-placeholder="Choose an area..." class="chosen-select"
+                {% endif %}
+        >
+            <option value="DB_NULL"></option>
+            {% for referenced_item_data in editable_referenced_models_contents[referenced_model].items %}
+                {% if referenced_item_data[models_list[referenced_model].fields.in_list[0]] is iterable %}
+                    {# it's multilanguage #}
+                    {% set field_value = referenced_item_data[referenced_field][config.domain_structure.language] %}
+                {% else %}
+                    {% set field_value = referenced_item_data[referenced_field] %}
+                {% endif %}
+
+                {# little hack: if referenced model is self (static_pages parents eg), do not show self id #}
+                {% if model_name == referenced_model and referenced_item_data['id'] == data['id'] %}
+                    {#nothing to do, it's self#}
+                {% else %}
+                    <option
+                            value="{{ referenced_item_data['id'] }}"
+                            {% if referenced_item_data['id'] == data['id'] %} selected="selected"{% endif %}
+                    >{{ data[referenced_model ~ '_id'] }}{{ field_value }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+        {% if field_info is not null %}
+            {% if field_info.type == "select-finder" %}
+                <script type="text/javascript">
+                    $(function () {
+                        console.log('dfgfgf');
+                        $('[name="{{ referenced_model ~ '_id' }}"]').chosen();
+                    });
+                </script>
+            {% endif %}
+        {% endif %}
+
+    {% else %}
+        {# just display a form element#}
+        {% if field_info is not null %}
+            {# field has specific settings #}
+            {% if field_info.classes is not null %}
+                {# classes for the form element #}
+                {% set classes = field_info.classes %}
+            {% endif %}
+            {% if  field_info.type is not null %}
+                {% if field_info.type == "textarea" %}
+                    {% if 'richtext' in field_info.classes %}
+                        {% set printed = true %}
+                        <textarea id="richtext_{{ field }}{{ language_array }}" data-qa="{{ field }}" name="{{ field }}{{ language_array }}" class="{{ classes }}">
+                            {{ field_value }}
+                        </textarea>
+                        <script>
+                            $(document).ready(function() {
+                                tinymce.init({
+                                    'language': '{{ config.domain_structure.language }}',
+                                    content_css: "{{ theme_style_sheet }}",
+                                    selector: ".richtext",
+                                    height: 300,
+                                    plugins: "image visualblocks table fullscreen layer template code",
+                                    verify_html: false,
+                                    file_browser_callback: RoxyFileBrowser,
+                                    {% if theme_blocks_json is not null %}
+                                    templates: {{ theme_blocks_json|raw }}
+                                    {% endif %}
+                                });
+                            });
+                        </script>
+                    {% endif %}
+
+                {% elseif field_info.type == "file" %}
+                    {% set printed = true %}
+                    {{ field_value }}
+                    <input type="file" data-qa="{{ field }}" name="{{ field }}" />
+
+                {% elseif field_info.type == "date" %}
+                    {% set printed = true %}
+                    <input type="text" id="{{ field }}" data-qa="{{ field }}" name="{{ field }}" value="{{ field_value }}" class="datetime-picker" />
+                    <script>
+                        // https://flatpickr.js.org/
+                        $(function () {
+                            $('#{{ field }}').flatpickr({
+                                enableTime: true,
+                                dateFormat: "Y-m-d H:i:ss",
+                                time_24hr: true,
+                                defaultHour: 0,
+                                defaultDate: '{{ field_value }}',
+                                allowInput: true
+                            });
+                        });
+                    </script>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        {% if not printed %}
+            {# not any specific info for this field #}
+            <input type="text" data-qa="{{ field }}" size=50 name="{{ field }}{{ language_array }}" value="{{ field_value }}" />
+        {% endif %}
+
+    {% endif %}
+{% else %}
+    {# field not fillable, display as text #}
+    {% if models_metadata[model_name][field] is not null %}
+        {#field nice value is defined on model metadata#}
+        {{ models_metadata[model_name][field]['by_id'][data[field]] }}
+    {% else %}
+        {% if field_value is iterable %}
+            <ul>
+            {% for key, value in field_value %}
+                <li style="margin-bottom: 40px"><h4>{{ key }}</h4>
+                {% if value is iterable %}
+                    <table border="1">
+                    {% for key2, value2 in value %}
+                        <tr>
+                            {# see Api :: GetApplicationCommand :: 43 #}
+                            {% set kkey = key2|split('##') %}
+                            <td style="width:70%; padding:15px; font-weight: bold; text-transform: uppercase">{{ kkey[0] }}</td>
+                            <td style="text-align: right; padding: 15px;">
+                                <span>{{ value2 }}</span>
+                                <input type="button" class="copy_to_clipboard" value="copy" style="font-size: 11px; padding: 5px; margin: 5px;"  />
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                {% else %}
+                    : {{ value }}
+                {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            {% if field_info is not null %}
+                {% if field_info.type == "s3_image" %}
+                    <a href="{{ field_value }}" target="_blank" style="position:absolute;right:5%;border:1px solid grey;">
+                        <img data-qa="{{ field }}" src="{{ field_value }}" style="float:right;height:150px;"/>
+                    </a>
+                {% endif %}
+            {% else %}
+                {{ field_value }}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endif %}

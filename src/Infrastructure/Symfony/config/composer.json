@@ -1,0 +1,17 @@
+{
+  "repositories": [
+    {
+      "url": "git@bitbucket.org:grupoblidoo/osds-api.git",
+      "type": "git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/",
+      "Osds\\Backoffice\\": "vendor/osds/backoffice/src"
+    }
+  },
+  "bin": [
+    "bin/post_install"
+  ]
+}

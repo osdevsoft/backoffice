@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block page_title locale['Administration Panel'] %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    {#<link rel="stylesheet" href="{{ asset('/fonts/font-awesome/css/font-awesome.min.css') }}">#}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    {#<link rel="stylesheet" href="{{ asset('/css/panel.css?v={{ cache }}') }}">#}
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <style>
+        {{ css_file_contents }}
+    </style>
+
+    <script>
+        {{ js_file_contents|raw }}
+    </script>
+
+</head>
+<body>
+
+<div id="header">
+    <h1>{{ locale['Administration Panel'] }}</h1>
+</div>
+
+<div id="content">
+    {% if alert_message is not null %}
+        <div class="alert alert-message alert-{{ alert_message.type }}">{{ alert_message.message }}</div>
+    {% endif %}
+    {% block contents " " %}
+</div>
+
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

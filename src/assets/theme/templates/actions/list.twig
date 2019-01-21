@@ -1,0 +1,162 @@
+{% extends 'layout.twig' %}
+
+{% block contents %}
+
+{% if models_list[model]['fields']['in_list']|length > 0 %}
+    {% set model_viewable_fields = models_list[model]['fields']['in_list'] %}
+{% else %}
+    {% set model_viewable_fields = data[0]|keys %}
+{% endif %}
+
+{% if models_list[model]['fields']['fields_schema']|length > 0 %}
+    {% set model_fields_schema = models_list[model]['fields']['fields_schema'] %}
+{% else %}
+    {% set model_fields_schema = null %}
+{% endif %}
+
+{% if models_list[model]['schema']|length > 0 %}
+    {% set model_schema = models_list[model]['schema'] %}
+{% else %}
+    {% set model_schema = null %}
+{% endif %}
+
+{% if model_schema is not null and model_schema.nice_name is not null %}
+    {% set model_nice_name = model_schema.nice_name %}
+{% else %}
+    {% set model_nice_name = model %}
+{% endif %}
+
+{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/create' %}
+
+<h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+
+{% include 'twig_partials/list/finder.twig' with {
+    'model_name': model,
+    'models_metadata': models_metadata
+}
+%}
+
+{% if model_schema.user_can_create is null or model_schema.user_can_create == true %}
+    <div class="new-entry">
+        <a href="/{{ backoffice_folder }}/{{ model }}/create">{{ locale['Create new'] }}</a>
+    </div>
+{% endif %}
+
+{% if total_items == 0 %}
+    {{ locale['No results found'] }}
+{% else %}
+<b>{{ total_items }}</b> {{ locale['elements found'] }}
+
+
+<table class="content-listing">
+    <tr>
+
+        {% for field in model_viewable_fields %}
+
+
+        <td>
+                {% if model_fields_schema[field].nice_name is not null %}
+                    {{ model_fields_schema[field].nice_name }}
+                {% else %}
+                    {{ field|replace({'.': ' ', '_': " "}) }}
+                {% endif %}
+                <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=asc&{{ query_string_search_fields }}">&#8679;</a>
+                <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=desc&{{ query_string_search_fields }}">&#8681;</a>
+            </td>
+        {% endfor %}
+        <td width="10%">{{ locale['Actions'] }}</td>
+
+    </tr>
+
+    {% for item in data %}
+
+        <tr>
+            {% for field in model_viewable_fields %}
+
+                {% set printed = false %}
+                {% if '.' in field %}
+                    {# it's from a related model #}
+                    {% set related_field_data = field|split('.') %}
+                    {% set related_model = related_field_data[0] %}
+                    {% set related_field = related_field_data[1] %}
+                    {% if models_metadata[related_model][related_field] is not null %}
+                        {#field nice value is defined on model metadata#}
+                        {% set printed = true %}
+                        {% set related_model_field_value = item['relations'][related_model]['items'][0][related_field] %}
+                        <td>{{ models_metadata[related_model][related_field]['by_id'][related_model_field_value] }}</td>
+                    {% else %}
+                        <td>
+                            {#{{ item['relations'][related_model]['items'][0][related_field] }}#}
+                            {% set item_data = item %}
+                            {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
+                            {% for i in 0..(related_field_data|length - 1) %}
+                                {# entity or field (we don't know which is it) until we check "i" #}
+                                {% set entity_or_field_name = related_field_data[i] %}
+                                {% if i != (related_field_data|length - 1) %}
+                                    {# it's not the last element => it's an entity #}
+                                    {% set item_data = item_data['relations'][entity_or_field_name]['items'][0] %}
+                                {% else %}
+                                    {# it's the last element => it's the field => get the value #}
+                                    {{ item_data[entity_or_field_name] }}
+                                {% endif %}
+                            {% endfor %}
+
+                        </td>
+                    {% endif %}
+                {% else %}
+
+                    {% if model_schema.multilanguage_fields is not null
+                    and field in model_schema.multilanguage_fields
+                    and item[field] is iterable
+                    %}
+                        {% set field_value = item[field][config.domain_structure.language] %}
+                    {% else %}
+                        {% set field_value = item[field] %}
+                    {% endif %}
+
+                    <td>
+                        {% if models_metadata[model][field] is not null %}
+                            {#field nice value is defined on model metadata#}
+                            {% set printed = true %}
+                            {{ models_metadata[model][field]['by_id'][item[field]] }}
+                        {% else %}
+                            {# it's a non fillable field #}
+
+                            {% if model_fields_schema[field] is not null %}
+
+                                {# check if it's a rich text field #}
+                                {% set field_info = model_fields_schema[field] %}
+                                {% if 'richtext' in field_info.classes and item[field] is not null and item[field] != "" %}
+                                    {% set printed = true %}
+                                    {{ field_value|raw }}
+                                {% endif %}
+                            {% endif %}
+
+
+                            {% if printed == false %}
+                                {# do not treat, just print#}
+                                {% if field_value is iterable %}
+                                    {#{{ dump(field_value) }}#}
+                                {% else %}
+                                    {{ field_value }}
+                                {% endif %}
+                            {% endif %}
+
+                         {% endif %}
+                    </td>
+                {% endif %}
+            {% endfor %}
+            <td class="actions">
+                <a data-qa="{{ locale['View'] }}" href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item.id }}">[{{ locale['View'] }}]</a>
+                {#<a onclick="check_delete('{{ model }}', {{ item.id }})" href="#">[{{ locale['Delete'] }}]</a>#}
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+{% include 'twig_partials/list/paginator.twig' %}
+
+{% endif %}
+
+{% endblock %}

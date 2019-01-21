@@ -1,0 +1,97 @@
+{% extends 'layout.twig' %}
+
+{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model_name ~ '/edit/' ~ data.id %}
+
+{% if models_list[model]['schema']|length > 0 %}
+    {% set model_schema = models_list[model]['schema'] %}
+{% else %}
+    {% set model_schema = null %}
+{% endif %}
+
+{% if model_schema is not null and model_schema.nice_name is not null %}
+    {% set model_nice_name = model_schema.nice_name %}
+{% else %}
+    {% set model_nice_name = model %}
+{% endif %}
+
+{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/edit/' ~ data[0]['id'] %}
+
+{% block contents %}
+
+    <h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+
+    <div id="detail-actions">
+    {% include views.detail_actions
+        with {
+            'data': data[0],
+            'model_constants': models_metadata[model]
+        }
+    %}
+    </div>
+    {% for content in data[0]['original_data']  %}
+        {% for key, value in content  %}
+            <input type="hidden" data-qa="{{ key }}" value="{{ value }}" />
+        {% endfor %}
+    {% endfor %}
+
+    {% include 'twig_partials/detail/form.twig'
+            with {
+                    'form_action': form_action,
+                    'data': data[0],
+                    'models': models_list,
+                    'model_name': model,
+                    'editable_referenced_models_contents': editable_referenced_models_contents
+            }
+    %}
+
+    {% if models_list[model]['related_models']|length > 0 %}
+        <section id="referenced-models">
+            <hr>
+            <h3>Referenced Data</h3>
+            {% include 'twig_partials/detail/referenced_models.twig' with {
+                'relations_data': data[0]['relations'],
+                'models': models_list,
+                'related_models': models_list[model]['related_models'],
+                'schema': schema,
+                'parent_model': model,
+                'parent_id': data[0].id
+                }
+            %}
+        </section>
+    {% endif %}
+
+    <div style="height:50px"></div>
+
+    {# Javascript to reload order detail page (parent page) #}
+    {% if model == 'voucher' %}
+        <script type="application/javascript">
+            if(window.opener != null && !window.opener.closed) {
+                window.opener.location.reload(true);
+            }
+        </script>
+    {% endif %}
+
+<script>
+$(document).ready(function() {
+    $('.copy_to_clipboard').on('click', function() {
+       var element_to_be_copied = $($(this).siblings('span')[0]).html();
+        if(element_to_be_copied == '')
+        {
+            alert('No value copied');
+            element_to_be_copied = 'N/A';
+        }
+        const el = document.createElement('textarea');
+        el.value = element_to_be_copied;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        $($(this).closest('tr')[0]).css('background-color', '#DDD');
+
+    });
+
+})
+
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% set relations_data_backup = relations_data %}
+
+{% for model in related_models %}
+    {% set relations_data = relations_data_backup %}
+    {% if '.' in model %}
+        {% set model_hierarchy = model|split('.') %}
+        {# parse all to get the final entity to show #}
+        {% for i in 0..(model_hierarchy|length - 1) %}
+            {% set entity = model_hierarchy[i] %}
+            {% if i != (model_hierarchy|length - 1) %}
+                {# it's not the last entity #}
+                {% set relations_data = relations_data[entity]['items'][0]['relations'] %}
+            {% else %}
+                {# it's the last entity #}
+                {% set model = model_hierarchy[i] %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if models[model]['fields']['in_list']|length > 0 %}
+        {% set model_viewable_fields = models[model]['fields']['in_list'] %}
+    {% else %}
+        {% set model_viewable_fields = schema['referenced_models'][model]['schema']['fields']|keys %}
+    {% endif %}
+
+    <section id="related-model-{{ model }}">
+
+    <h4>{{ model }} ({{ relations_data[model]['total_items'] }})</h4>
+    {% if referenced_fields[model].is_referenced == false %}
+        <div class="new-entry">
+            <a href="/{{ backoffice_folder }}/{{ model }}/create/?creation_vars[{{ parent_model }}_id]={{ parent_id }}">
+                {{ locale['Create new'] }} {{ model }} {{ locale['for this element'] }}
+            </a>
+        </div>
+    {% endif %}
+
+    {% if relations_data[model]|length > 0 %}
+        <table class="content-listing">
+                <tr>
+                {% for value in model_viewable_fields %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+                <td width="10%">{{ locale['Actions'] }}</td>
+                </tr>
+                {% for item in relations_data[model]['items'] %}
+                <tr>
+                    {% for field in model_viewable_fields %}
+                        <td>
+                            {% if '.' in field %}
+                                {# it's from a related model #}
+                                {% set related_field = field|split('.') %}
+                                {% set related_model = related_field[0] %}
+                                {% set related_field = related_field[1] %}
+
+                                {% if models_metadata[related_model][related_field] is not null %}
+                                    {#field nice value is defined on model metadata#}
+                                    {% set printed = true %}
+                                    {% set related_model_field_value = relations_data[related_model]['relations'][related_model]['items'][0][related_field] %}
+                                    {{ models_metadata[related_model][related_field]['by_id'][related_model_field_value] }}
+
+                                {% else %}
+                                    {#the content is on the relations_data (or maybe in it self) #}
+                                    {{ item['relations'][related_model]['items'][0][related_field] }}
+
+                                {% endif %}
+
+
+
+
+                            {% else %}
+                                {% if models_metadata[model][field] is not null %}
+                                    {#field nice value is defined on model metadata#}
+                                    {% set printed = true %}
+                                    {{ models_metadata[model][field]['by_id'][item[field]] }}
+                                {% else %}
+                                    {% if item[field] is iterable %}
+                                        {#{{ dump(item[field]) }}#}
+                                    {% else %}
+                                        {{ item[field] }}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td class="actions">
+                        <a href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item['id'] }}">[{{ locale['View'] }}]</a>
+                        {#<a onclick="check_delete('{{ model }}', {{ item['id'] }})" href="#">[{{ locale['Delete'] }}]</a>#}
+                    </td>
+                </tr>
+                {% endfor %}
+
+        </table>
+    {% else %}
+        <br />{{ locale['No elements found'] }}
+    {% endif %}
+<hr style="border-width:5px;">
+    </section>
+
+{% endfor %}

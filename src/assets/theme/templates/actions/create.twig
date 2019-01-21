@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% if models_list[model]['schema']|length > 0 %}
+    {% set model_schema = models_list[model]['schema'] %}
+{% else %}
+    {% set model_schema = null %}
+{% endif %}
+
+{% if model_schema is not null and model_schema.nice_name is not null %}
+    {% set model_nice_name = model_schema.nice_name %}
+{% else %}
+    {% set model_nice_name = model %}
+{% endif %}
+
+{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/create' %}
+
+{% block contents %}
+
+    <h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+    {% include 'twig_partials/detail/form.twig' with {'form_action': form_action, 'data': data[0], 'models': models_list, 'model_name': model } %}
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{
+  "name": "osds/backoffice",
+  "description": "Easy backoffice for Laravel",
+  "authors": [
+    {
+      "name": "Open Source Development Services",
+      "email": "info@osds.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "version": "0.1",
+  "require": {
+    "phpunit/phpunit": "^7.0",
+    "guzzlehttp/guzzle": "6.3.*",
+    "symfony/yaml": "4.2.*"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "Osds\\Backoffice\\": [
+        "src/"
+      ]
+    }
+  },
+
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Osds\\Backoffice\\OsdsBackofficeServiceProvider"
+      ]
+    }
+  }
+}
