@@ -1,8 +1,0 @@
-#!/usr/bin/env php
-
-<?php
-#not working yet, check composer configuring recipes
-//$origin = __DIR__ . '../../src/Framework/Symfony/config/osds_api.yaml';
-//$destiny = __DIR__ . '../../../../../config/packages/osds_api.yaml';
-//
-//copy($origin, $destiny);

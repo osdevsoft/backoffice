@@ -1,0 +1,7 @@
+"extra": {
+  "laravel": {
+    "providers": [
+      "Osds\\Backoffice\\OsdsBackofficeServiceProvider"
+    ]
+  }
+}

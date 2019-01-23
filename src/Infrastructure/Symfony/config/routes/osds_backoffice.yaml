@@ -1,0 +1,3 @@
+controllers:
+    resource: ../../vendor/osds/backoffice/src/Infrastructure/Controllers/
+    type: annotation
