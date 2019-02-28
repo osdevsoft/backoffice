@@ -1,0 +1,116 @@
+{% block navbar %}
+<!-- Left side column. contains the sidebar -->
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>Alexander Pierce</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MAIN NAVIGATION</li>
+        {% for model_item in models_list|keys %}
+            {% if models_list[model_item]['schema']['visible_in_navbar'] is null or models_list[model_item]['schema']['visible_in_navbar'] == true %}
+
+                {% set filter_url = '' %}
+
+                {% if models_list[model_item]['filters'] is not null %}
+                    {% set initialized_subfilters_list = false %}
+                    {% for filter_name, filter_params in models_list[model_item]['filters'] %}
+                        {% set filter_url = '?' %}
+                        {% set search_fields_data = [] %}
+                        {% set query_filter_data = [] %}
+                        {% if filter_params is iterable %}
+                            {% for key,value in filter_params %}
+                                {% if key == 'search_fields' %}
+                                    {% set search_fields = value %}
+                                    {% for idx, field_values in search_fields %}
+                                        {% if field_values['operand'] is defined %}
+                                            {% set search_fields_data = search_fields_data|merge(['search_fields[' ~ field_values['field'] ~ '][value]=' ~ field_values['value']]) %}
+                                            {% set search_fields_data = search_fields_data|merge(['search_fields[' ~ field_values['field'] ~ '][operand]=' ~ field_values['operand']]) %}
+                                        {% else %}
+                                            {% set search_fields_data = search_fields_data|merge(['search_fields[' ~ field_values['field'] ~ '][value]=' ~ field_values['value']]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elseif key == 'query_filter' %}
+                                    {% set query_filter = value %}
+                                    {% for idx, query_values in query_filter %}
+                                        {% if query_values is iterable %}
+                                            {% if idx == 'sortby' %}
+                                                {% for idx_filter, filter_values in query_values %}
+                                                    {% set query_filter_data = query_filter_data|merge(['query_filters[' ~ idx ~ '][' ~ loop.index0 ~'][field]=' ~ filter_values['field']]) %}
+                                                    {% set query_filter_data = query_filter_data|merge(['query_filters[' ~ idx ~ '][' ~ loop.index0 ~'][dir]=' ~ filter_values['dir']]) %}
+
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% set query_filter_data = query_filter_data|merge(['query_filters[' ~ idx ~ ']=' ~ query_values]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if search_fields_data is empty %}
+                            {% set filter_url =  filter_url ~ query_filter_data|join('&')  %}
+                        {% else %}
+                            {% set filter_url = filter_url ~ search_fields_data|join('&') ~  '&' ~ query_filter_data|join('&')  %}
+                        {% endif %}
+
+                        {% if filter_name == 'main' %}
+                            {% if models_list[model_item].schema is not null and models_list[model_item].schema.nice_name is not null %}
+                                {% set model_name =  models_list[model_item].schema.nice_name %}
+                            {% else %}
+                                {% set model_name =  model_item %}
+                            {% endif %}
+                        {% endif %}
+
+                        {% if filter_name != 'main' and initialized_subfilters_list == false %}
+                            {% set initialized_subfilters_list = true %}
+                            <ul>
+                        {% endif %}
+                        {% if filter_name != 'main' %}
+                            {% set model_name = filter_name %}
+                        {% endif %}
+
+                        <li class="treeview" {% if model_item == model %}class="selected"{% endif %}>
+                        <a href="/{{ backoffice_folder }}/{{ model_item }}{{ filter_url }}">{{ model_name }}</a>
+
+                    {% endfor %}
+
+                    </li>
+                    {% if initialized_subfilters_list == true %}
+                        {% set initialized_subfilters_list = false %}
+                        </ul></li>
+                    {% endif %}
+                {% else %}
+                    <li data-qa="{{ model_item }}" {% if model_item == model %}class="selected"{% endif %}>
+                        <a href="/{{ backoffice_folder }}/{{ model_item }}{{ filter_url }}">
+                            <i class="fa fa-files-o"></i>
+                            <span>{{ model_item }}</span>
+                        </a>
+                {% endif %}
+            {% endif %}
+
+        {% endfor %}
+    </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>
+{% endblock %}
+
+<script>
+
+    $('#navbar li').on('click', function() {
+        window.location.href = $($(this).find('a')[0]).attr('href');
+    })
+
+</script>

@@ -28,7 +28,10 @@
 
 {% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/create' %}
 
-<h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+
+<section class="content-header">
+    <h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+</section>
 
 {% include 'twig_partials/list/finder.twig' with {
     'model_name': model,
@@ -47,113 +50,120 @@
 {% else %}
 <b>{{ total_items }}</b> {{ locale['elements found'] }}
 
+<div class="box">
 
-<table class="content-listing">
-    <tr>
+    <!-- /.box-header -->
+    <div class="box-body no-padding">
 
-        {% for field in model_viewable_fields %}
+        <table class="table table-striped">
+            <thead>
+
+                {% for field in model_viewable_fields %}
 
 
-        <td>
-                {% if model_fields_schema[field].nice_name is not null %}
-                    {{ model_fields_schema[field].nice_name }}
-                {% else %}
-                    {{ field|replace({'.': ' ', '_': " "}) }}
-                {% endif %}
-                <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=asc&{{ query_string_search_fields }}">&#8679;</a>
-                <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=desc&{{ query_string_search_fields }}">&#8681;</a>
-            </td>
-        {% endfor %}
-        <td width="10%">{{ locale['Actions'] }}</td>
-
-    </tr>
-
-    {% for item in data %}
-
-        <tr>
-            {% for field in model_viewable_fields %}
-
-                {% set printed = false %}
-                {% if '.' in field %}
-                    {# it's from a related model #}
-                    {% set related_field_data = field|split('.') %}
-                    {% set related_model = related_field_data[0] %}
-                    {% set related_field = related_field_data[1] %}
-                    {% if models_metadata[related_model][related_field] is not null %}
-                        {#field nice value is defined on model metadata#}
-                        {% set printed = true %}
-                        {% set related_model_field_value = item['relations'][related_model]['items'][0][related_field] %}
-                        <td>{{ models_metadata[related_model][related_field]['by_id'][related_model_field_value] }}</td>
-                    {% else %}
-                        <td>
-                            {#{{ item['relations'][related_model]['items'][0][related_field] }}#}
-                            {% set item_data = item %}
-                            {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
-                            {% for i in 0..(related_field_data|length - 1) %}
-                                {# entity or field (we don't know which is it) until we check "i" #}
-                                {% set entity_or_field_name = related_field_data[i] %}
-                                {% if i != (related_field_data|length - 1) %}
-                                    {# it's not the last element => it's an entity #}
-                                    {% set item_data = item_data['relations'][entity_or_field_name]['items'][0] %}
-                                {% else %}
-                                    {# it's the last element => it's the field => get the value #}
-                                    {{ item_data[entity_or_field_name] }}
-                                {% endif %}
-                            {% endfor %}
-
-                        </td>
-                    {% endif %}
-                {% else %}
-
-                    {% if model_schema.multilanguage_fields is not null
-                    and field in model_schema.multilanguage_fields
-                    and item[field] is iterable
-                    %}
-                        {% set field_value = item[field][config.domain_structure.language] %}
-                    {% else %}
-                        {% set field_value = item[field] %}
-                    {% endif %}
-
-                    <td>
-                        {% if models_metadata[model][field] is not null %}
-                            {#field nice value is defined on model metadata#}
-                            {% set printed = true %}
-                            {{ models_metadata[model][field]['by_id'][item[field]] }}
+                <th>
+                        {% if model_fields_schema[field].nice_name is not null %}
+                            {{ model_fields_schema[field].nice_name }}
                         {% else %}
-                            {# it's a non fillable field #}
+                            {{ field|replace({'.': ' ', '_': " "}) }}
+                        {% endif %}
+                        <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=asc&{{ query_string_search_fields }}">&#8679;</a>
+                        <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=desc&{{ query_string_search_fields }}">&#8681;</a>
+                    </th>
+                {% endfor %}
+                <th>{{ locale['Actions'] }}</th>
 
-                            {% if model_fields_schema[field] is not null %}
+            </thead>
+            <tbody>
 
-                                {# check if it's a rich text field #}
-                                {% set field_info = model_fields_schema[field] %}
-                                {% if 'richtext' in field_info.classes and item[field] is not null and item[field] != "" %}
+            {% for item in data %}
+
+                <tr>
+                    {% for field in model_viewable_fields %}
+
+                        {% set printed = false %}
+                        {% if '.' in field %}
+                            {# it's from a related model #}
+                            {% set related_field_data = field|split('.') %}
+                            {% set related_model = related_field_data[0] %}
+                            {% set related_field = related_field_data[1] %}
+                            {% if models_metadata[related_model][related_field] is not null %}
+                                {#field nice value is defined on model metadata#}
+                                {% set printed = true %}
+                                {% set related_model_field_value = item['relations'][related_model]['items'][0][related_field] %}
+                                <td>{{ models_metadata[related_model][related_field]['by_id'][related_model_field_value] }}</td>
+                            {% else %}
+                                <td>
+                                    {#{{ item['relations'][related_model]['items'][0][related_field] }}#}
+                                    {% set item_data = item %}
+                                    {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
+                                    {% for i in 0..(related_field_data|length - 1) %}
+                                        {# entity or field (we don't know which is it) until we check "i" #}
+                                        {% set entity_or_field_name = related_field_data[i] %}
+                                        {% if i != (related_field_data|length - 1) %}
+                                            {# it's not the last element => it's an entity #}
+                                            {% set item_data = item_data['relations'][entity_or_field_name]['items'][0] %}
+                                        {% else %}
+                                            {# it's the last element => it's the field => get the value #}
+                                            {{ item_data[entity_or_field_name] }}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </td>
+                            {% endif %}
+                        {% else %}
+
+                            {% if model_schema.multilanguage_fields is not null
+                            and field in model_schema.multilanguage_fields
+                            and item[field] is iterable
+                            %}
+                                {% set field_value = item[field][config.domain_structure.language] %}
+                            {% else %}
+                                {% set field_value = item[field] %}
+                            {% endif %}
+
+                            <td>
+                                {% if models_metadata[model][field] is not null %}
+                                    {#field nice value is defined on model metadata#}
                                     {% set printed = true %}
-                                    {{ field_value|raw }}
-                                {% endif %}
-                            {% endif %}
-
-
-                            {% if printed == false %}
-                                {# do not treat, just print#}
-                                {% if field_value is iterable %}
-                                    {#{{ dump(field_value) }}#}
+                                    {{ models_metadata[model][field]['by_id'][item[field]] }}
                                 {% else %}
-                                    {{ field_value }}
-                                {% endif %}
-                            {% endif %}
+                                    {# it's a non fillable field #}
 
-                         {% endif %}
+                                    {% if model_fields_schema[field] is not null %}
+
+                                        {# check if it's a rich text field #}
+                                        {% set field_info = model_fields_schema[field] %}
+                                        {% if 'richtext' in field_info.classes and item[field] is not null and item[field] != "" %}
+                                            {% set printed = true %}
+                                            {{ field_value|raw }}
+                                        {% endif %}
+                                    {% endif %}
+
+
+                                    {% if printed == false %}
+                                        {# do not treat, just print#}
+                                        {% if field_value is iterable %}
+                                            {#{{ dump(field_value) }}#}
+                                        {% else %}
+                                            {{ field_value }}
+                                        {% endif %}
+                                    {% endif %}
+
+                                 {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    <td class="actions">
+                        <a data-qa="{{ locale['View'] }}" href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item.id }}">[{{ locale['View'] }}]</a>
+                        {#<a onclick="check_delete('{{ model }}', {{ item.id }})" href="#">[{{ locale['Delete'] }}]</a>#}
                     </td>
-                {% endif %}
+                </tr>
             {% endfor %}
-            <td class="actions">
-                <a data-qa="{{ locale['View'] }}" href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item.id }}">[{{ locale['View'] }}]</a>
-                {#<a onclick="check_delete('{{ model }}', {{ item.id }})" href="#">[{{ locale['Delete'] }}]</a>#}
-            </td>
-        </tr>
-    {% endfor %}
-
-</table>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% include 'twig_partials/list/paginator.twig' %}
 

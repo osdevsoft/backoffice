@@ -47,7 +47,7 @@ class BaseModelCommand
         } else {
             // need to get model name (the url one, laravel prefix) from route
             #TODO
-            $this->model_name = 'customer';
+            $this->model_name = 'user';
         }
 
         $this->request_base_url = $this->model_name;

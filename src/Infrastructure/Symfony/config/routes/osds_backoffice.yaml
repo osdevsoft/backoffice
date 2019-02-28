@@ -1,0 +1,4 @@
+
+osds_api:
+  resource: '../vendor/osds/backoffice/src/UI/'
+  type:     annotation

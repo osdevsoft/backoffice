@@ -11,18 +11,10 @@ languages:
   - en
 
 persistence:
-  ds160_url:
+  user_image:
     repository: S3
     parameters:
-      folder: ds_160
-  pdf_url:
-    repository: S3
-    parameters:
-      folder: voucher
-  interview_instructions_file:
-    repository: S3
-    parameters:
-      folder: interview_instructions
+      folder: user_images
 
 models:
 
