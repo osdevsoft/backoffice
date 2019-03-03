@@ -1,16 +1,6 @@
 {% if paginator.pages is not null %}
 
-<style>
-    .paginator {
-        list-style-type: none;
-    }
-    .paginator li {
-        display: inline;
-    }
-</style>
-
-<div class="paginator">
-    <ul>
+    <ul class="pagination pagination-sm no-margin">
 
     {% if paginator.first %}
         <li><a href="{{ paginator.first }}">&laquo;&laquo;</a></li>
@@ -22,16 +12,20 @@
 
      {% for page_num, page_link in paginator.pages %}
         <li>
-            [
-            {% if page_num != paginator.current_page %}
-            <a href="{{ page_link }}">
+
+            {% if page_num == paginator.current_page %}
+                {% set page_link = '#' %}
+                {% set class = 'active' %}
+            {% else %}
+                {% set class = '' %}
             {% endif %}
-                {% if paginator.mode == 'results' %}
-                    {{ max( (page_num - 1)  * items_per_page, 1) }}-{{ page_num  * items_per_page}}</a>
-                {% else %}
-                    {{ page_num }}</a>
-                {% endif %}
-             ]
+            <a href="{{ page_link }}" class="{{ class }}">
+            {% if paginator.mode == 'results' %}
+                {{ max( (page_num - 1)  * items_per_page, 1) }}-{{ page_num  * items_per_page}}
+            {% else %}
+                {{ page_num }}
+            {% endif %}
+            </a>
         </li>
     {% endfor %}
 
@@ -46,3 +40,9 @@
     </ul>
 </div>
 {% endif %}
+
+<style>
+    .pagination .active {
+        background-color: #0fd3d7;
+    }
+</style>

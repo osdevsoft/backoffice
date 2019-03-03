@@ -194,7 +194,6 @@ class Request
             if (isset($this->data['get']) && count($this->data['get']) > 0) {
                 $this->url .= '&' . http_build_query($this->data['get']);
             }
-
             if ($this->event != null) {
                 $this->url .= '?log_event=' . $this->event;
             }

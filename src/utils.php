@@ -5,14 +5,14 @@ namespace Osds\Backoffice\Utils;
 use Symfony\Component\Yaml\Yaml;
 
 
-public function getAlertMessages()
+function getAlertMessages($request_data)
 {
     $message = null;
 
-    if (isset($this->request_data['get']['action_message'])) {
-        $message = ['message' => $this->request_data['get']['action_message'] ];
-        if (isset($this->request_data['get']['action_result'])) {
-            $message['type'] = $this->request_data['get']['action_result'];
+    if (isset($request_data->parameters['action_message'])) {
+        $message = ['message' => $request_data->parameters['action_message'] ];
+        if (isset($request_data->parameters['action_result'])) {
+            $message['type'] = $request_data->parameters['action_result'];
         } else {
             $message['type'] = 'info';
         }
@@ -21,7 +21,7 @@ public function getAlertMessages()
     return $message;
 }
 
-public function redirect($url, $result = null, $message = null, $error = null)
+function redirect($url, $result = null, $message = null, $error = null)
 {
     $locale = $this->loadLocalization($this->vendor_path . '/assets/localization/');
 
@@ -51,25 +51,18 @@ public function redirect($url, $result = null, $message = null, $error = null)
 }
 
 
-public function loadSiteConfiguration()
+function loadSiteConfiguration()
 {
-    $this->loadConfigFile('domain_structure');
-}
-
-
-/**
- * Load Configuration File
- */
-function loadConfigFile($file)
-{
-    $path_file = __DIR__ . '/../../../../../../config/backoffice/' . $file . '.yml';
+    $path_file = __DIR__ . '/../../../../config/backoffice/domain_structure.yml';
     if (!is_file($path_file)) {
         return false;
     }
-    $this->config[$file] = Yaml::parse(file_get_contents($path_file));
+    return Yaml::parse(file_get_contents($path_file));
 }
 
-public function folderSize($path)
+
+
+function folderSize($path)
 {
     $total_size = 0;
     $files = scandir($path);
@@ -96,19 +89,5 @@ function isMultilanguageField($field)
         is_array($field)
         && array_keys($field) == $this->config['domain_structure']['languages']
         ;
-}
-
-function getVisitorLanguage()
-{
-    if (isset($_GET['lang'])
-        && in_array($_GET['lang'], $this->config['domain_structure']['languages'])
-    ) {
-        $this->session->put('visitor_language', $_GET['lang']);
-    }
-    $this->visitor_language = $this->session->get('visitor_language');
-
-    if ($this->visitor_language == null) {
-        $this->visitor_language = 'es-es';
-    }
 }
 

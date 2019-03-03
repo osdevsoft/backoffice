@@ -2,6 +2,8 @@
 
 namespace Osds\Backoffice\UI\Helpers;
 
+use function Osds\Backoffice\Utils\getAlertMessages;
+
 use Symfony\Component\HttpFoundation\Response;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
@@ -34,22 +36,22 @@ trait View
 
         $this->twig_vars['model'] = $entity;
 
-        $this->twig_vars = $this->loadTwigVariables($data, $view);
+        $this->loadTwigVariables($data, $view, $entity);
 
-        $view = $context . '/';
-        $view .= $view;
+        $view = 'actions/' . $view;
+
 //        if (view()->exists($model.'/'.$method)) {
 //            $view .= $model . '/' . $method;
 //        }
 
         if ($view == 'detail') {
-            $twig_vars['views']['detail_actions'] = '/twig_partials/detail/actions';
+            $this->twig_vars['views']['detail_actions'] = '/twig_partials/detail/actions';
             #check if we have a custom view for the actions of this model
 //            if (view()->exists($model . '/' . $twig_vars['views']['detail_actions'])) {
 //                $twig_vars['views']['detail_actions'] = $model . '/' . $twig_vars['views']['detail_actions'];
 //            }
         }
-        $view = 'actions/list';
+
         return $this->renderTwigView($view, $this->twig_vars);
     }
 
@@ -69,13 +71,14 @@ trait View
         $this->loadPreviousSearchesTwigVariables();
         $this->loadAlertMessages();
         $this->loadLocales();
+
         if (isset($data['total_items'])) {
-            $this->twig_vars = $this->loadModelDataTwigVariables($model);
+            $this->loadModelDataTwigVariables($model);
 
             if ($data['total_items'] > 0
                 && $data['total_items'] > count($data['items'])
             ) {
-                $this->twig_vars = $this->loadPagination($twig_vars, $data['total_items']);
+                $this->loadPagination($data['total_items']);
             }
         }
 
@@ -86,7 +89,7 @@ trait View
 
     private function loadViewDataTwigVariables($data, $method, $model)
     {
-        #models for navigation
+        #entities for navigation
         $this->twig_vars['models_list'] = $this->models;
         $this->twig_vars['model'] = $model;
         #page title and section
@@ -131,9 +134,9 @@ trait View
      * @param $twig_vars
      * @return mixed
      */
-    private function loadAlertMessages($twig_vars)
+    private function loadAlertMessages()
     {
-        $this->twig_vars['alert_message'] = $this->getAlertMessages();
+        $this->twig_vars['alert_message'] = getAlertMessages($this->request);
     }
 
     /**
@@ -339,9 +342,31 @@ trait View
         $loader = new Twig_Loader_Filesystem($template_path);
 //        $loader->setTemplate('template_to_use', $template_path);
         $twig = new Twig_Environment($loader);
+        $twig = $this->loadFilters($twig);
 
         $html = $twig->render($view . '.twig', $params);
 
         return new Response($html);
     }
+
+
+    private function loadFilters($twig)
+    {
+        $twig->addFilter(new \Twig_Filter(
+            'bolder',
+            function ($string) {
+                return '<b>' . $string . '</b>';
+            }
+        ));
+        $twig->addFilter(new \Twig_Filter(
+            'dump',
+            function ($var) {
+                dd($var);
+            }
+        ));
+
+        return $twig;
+    }
+
+
 }

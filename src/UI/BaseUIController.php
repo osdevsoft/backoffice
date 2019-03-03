@@ -9,7 +9,7 @@ use Osds\Backoffice\UI\Helpers\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-
+use function Osds\Backoffice\Utils\loadSiteConfiguration;
 
 
 /**
@@ -32,13 +32,9 @@ class BaseUIController
 
     public $request;
 
-
-
     public $config;
 
     public $models;
-
-
 
     public $session;
 
@@ -77,7 +73,7 @@ class BaseUIController
                 $this->request->files = $_FILES;
             }
 
-            $this->loadSiteConfiguration();
+            $this->config['domain_structure'] = loadSiteConfiguration();
 
             $this->models = $this->config['domain_structure']['models'];
             

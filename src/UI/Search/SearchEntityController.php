@@ -24,7 +24,7 @@ class SearchEntityController extends BaseUIController
 
         parent::__construct();
     }
-    
+
     /**
      * Lists an entity items
      *
@@ -38,11 +38,8 @@ class SearchEntityController extends BaseUIController
      */
     public function search($entity)
     {
-
         $this->build();
 
-        #pagination
-        #$this->request_data['get']['query_filters']['page_items'] = $this->config['domain_structure']['pagination']['items_per_page'];
         $message_object = $this->getEntityMessageObject($entity, $this->request);
 
         $data = $this->query_bus->ask($message_object);
@@ -55,6 +52,35 @@ class SearchEntityController extends BaseUIController
 
     public function getEntityMessageObject($entity, $request)
     {
+        if (isset($this->config)
+            && isset($this->config['domain_structure'])
+            && isset($this->config['domain_structure']['models'][$entity])
+            && isset($this->config['domain_structure']['models'][$entity]['fields'])
+            && isset($this->config['domain_structure']['models'][$entity]['fields']['in_list'])
+        ) {
+           foreach ($this->config['domain_structure']['models'][$entity]['fields']['in_list'] as $listField) {
+               if (strstr($listField, '.')) {
+                  $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $listField);
+               }
+           }
+           if (isset($gatherEntities)) {
+              $request->parameters['get']['referenced_entities'] = implode(',', $gatherEntities);
+           }
+        }
+
+        if (isset($request->parameters['search_fields'])) {
+           $request->parameters['get']['search_fields'] = $request->parameters['search_fields'];
+           unset($request->parameters['search_fields']);
+        }
+
+        if (isset($request->parameters['query_filters'])) {
+            $request->parameters['get']['query_filters'] = $request->parameters['query_filters'];
+            unset($request->parameters['query_filters']);
+        }
+        #pagination
+        $request->parameters['get']['query_filters']['page_items'] = $this->config['domain_structure']['pagination']['items_per_page'];
+
+
         return new SearchEntityQuery(
             $entity,
             $request->parameters
