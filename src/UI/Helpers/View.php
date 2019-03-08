@@ -17,38 +17,38 @@ trait View
      *
      * @param array $data
      *                  items => results
-     *                  metadata => info of the model (metadata-model-views-type)
+     *                  metadata => info of the model (metadata-entity-views-type)
      *
      * @param null $action
      * @param string $context
      *
      * @return Response
      */
-    public function generateView($view, $entity, $data = null)
+    public function generateView($entity, $view, $data = null)
     {
-        $model = '';
+        $entity = '';
 
-        if (isset($data['twig_vars'])) {
-            $this->twig_vars = $data['twig_vars'];
+        if (isset($data->twig_vars)) {
+            $this->twig_vars = $data->twig_vars;
         } else {
             $this->twig_vars = [];
         }
 
-        $this->twig_vars['model'] = $entity;
+        $this->twig_vars['entity'] = $entity;
 
-        $this->loadTwigVariables($data, $view, $entity);
+        $this->loadTwigVariables($view, $entity, $data);
 
         $view = 'actions/' . $view;
 
-//        if (view()->exists($model.'/'.$method)) {
-//            $view .= $model . '/' . $method;
+//        if (view()->exists($entity.'/'.$method)) {
+//            $view .= $entity . '/' . $method;
 //        }
 
         if ($view == 'detail') {
             $this->twig_vars['views']['detail_actions'] = '/twig_partials/detail/actions';
-            #check if we have a custom view for the actions of this model
-//            if (view()->exists($model . '/' . $twig_vars['views']['detail_actions'])) {
-//                $twig_vars['views']['detail_actions'] = $model . '/' . $twig_vars['views']['detail_actions'];
+            #check if we have a custom view for the actions of this entity
+//            if (view()->exists($entity . '/' . $twig_vars['views']['detail_actions'])) {
+//                $twig_vars['views']['detail_actions'] = $entity . '/' . $twig_vars['views']['detail_actions'];
 //            }
         }
 
@@ -62,18 +62,18 @@ trait View
      * @param $data
      * @param $method
      * @param $twig_vars
-     * @param $model
+     * @param $entity
      * @return mixed
      */
-    private function loadTwigVariables($data, $method, $model)
+    private function loadTwigVariables($view, $entity, $data)
     {
-        $this->loadViewDataTwigVariables($data, $method, $model);
+        $this->loadViewDataTwigVariables($view, $entity, $data);
         $this->loadPreviousSearchesTwigVariables();
         $this->loadAlertMessages();
         $this->loadLocales();
 
         if (isset($data['total_items'])) {
-            $this->loadModelDataTwigVariables($model);
+            $this->loadModelDataTwigVariables($entity);
 
             if ($data['total_items'] > 0
                 && $data['total_items'] > count($data['items'])
@@ -87,22 +87,22 @@ trait View
 
     }
 
-    private function loadViewDataTwigVariables($data, $method, $model)
+    private function loadViewDataTwigVariables($view, $entity, $data)
     {
         #entities for navigation
-        $this->twig_vars['models_list'] = $this->models;
-        $this->twig_vars['model'] = $model;
+        $this->twig_vars['entities_list'] = $this->entities;
+        $this->twig_vars['current_entity'] = $entity;
         #page title and section
-        $this->twig_vars['action'] = $method;
+        $this->twig_vars['action'] = $view;
 
         #data itself to show
         $this->twig_vars['data'] = isset($data['items'])?$data['items']:null;
         $this->twig_vars['total_items'] = isset($data['total_items'])?$data['total_items']:null;
         $this->twig_vars['schema'] = isset($data['schema'])?$data['schema']:null;
-        if (isset($data['required_models_contents'])) {
-             $this->twig_vars['editable_referenced_models_contents'] = $data['required_models_contents'];
+        if (isset($data['required_entities_contents'])) {
+             $this->twig_vars['editable_referenced_entities_contents'] = $data['required_entities_contents'];
         } else {
-            $this->twig_vars['editable_referenced_models_contents'] = null;
+            $this->twig_vars['editable_referenced_entities_contents'] = null;
         }
 
         #templates for tinymce
@@ -122,9 +122,9 @@ trait View
      */
     private function loadPreviousSearchesTwigVariables()
     {
-        if (!empty($this->request_data['get']) && !empty($this->request_data['get']['search_fields'])) {
-            $this->twig_vars['search_fields'] = $this->request_data['get']['search_fields'];
-            $this->twig_vars['query_string_search_fields'] = http_build_query(['search_fields' => $this->request_data['get']['search_fields']]);
+        if (!empty($this->request_data->get) && !empty($this->request_data->get['search_fields'])) {
+            $this->twig_vars['search_fields'] = $this->request_data->get['search_fields'];
+            $this->twig_vars['query_string_search_fields'] = http_build_query(['search_fields' => $this->request_data->get['search_fields']]);
         }
     }
 
@@ -294,10 +294,10 @@ trait View
 
 
     #To deprecate, recover on first call
-    private function loadModelDataTwigVariables($model)
+    private function loadModelDataTwigVariables($entity)
     {
         #it is not possible to call it on constructor, Route::current (on getmetadata command) is null
-        $this->twig_vars['models_metadata'] = $this->loadModelMetadata($model)['items'][0];
+        $this->twig_vars['entity_metadata'] = $this->loadModelMetadata($entity)['items'][0];
     }
 
     /**
@@ -306,11 +306,11 @@ trait View
      * @param $model
      * @return mixed
      */
-    private function loadModelMetadata($model)
+    private function loadModelMetadata($entity)
     {
         try
         {
-            $this->requestRelatedModels($model);
+            $this->requestRelatedModels($entity);
             #return $this->performAction('getmetadata');
         } catch(\Exception $e)
         {
@@ -320,18 +320,18 @@ trait View
 
 
     /**
-     * @param $model
+     * @param $entity
      */
-    private function requestRelatedModels($model)
+    private function requestRelatedModels($entity)
     {
-        if (isset($this->models[$model]['related_models'])) {
-            $related_models = [];
-            foreach ($this->models[$model]['related_models'] as $related_model) {
-                if (strstr($related_model, '.') === false) {
-                    $related_models[] = $related_model;
+        if (isset($this->entites[$entity]['related_entities'])) {
+            $related_entities = [];
+            foreach ($this->entities[$entity]['related_entities'] as $related_entity) {
+                if (strstr($related_entity, '.') === false) {
+                    $related_entities[] = $related_entity;
                 }
             }
-            $this->request_data['get']['related_models'] = implode(',', $related_models);
+            $this->request_data->get['related_entities'] = implode(',', $related_entities);
         }
     }
 

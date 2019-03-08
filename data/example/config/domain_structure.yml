@@ -1,7 +1,7 @@
 pagination:
-  items_per_page: 20
-  pages_per_page: 10
-  display_mode: pages #pages, results
+  items_per_page: 2
+  pages_per_page: 3
+  display_mode: resultssim #pages, results
 
 language: en-en #default language
 
@@ -11,62 +11,31 @@ languages:
   - en
 
 persistence:
-  user_image:
+  image:
     repository: S3
     parameters:
       folder: user_images
 
-models:
 
-#  user:
-#    schema:
-#      "nice_name": "Usuarios" #name to show on backoffice navigator list
-#      public: false #used to show in public (visitors)
-#      "by_user": false #if true, logged user id will be added to post data when model is saved on sheet
-#    fields:
-#      in_list: #fields to show on backoffice list page
-#        - email
-#        - name
-#        - created_at
-#      in_detail: #fields to show on detail page
-#        - email
-#        - name
-#        - password
-#        - created_at
-#      fillable: #campos rellenables, tanto en la creacion como en la edicion
-#        - email
-#        - name
-#        - password
-#      fields_schema:
-#        email:
-#          nice_name: "Correo"
-#        name:
-#          nice_name: "Nombre del usuario"
-#          tooltip: "Qué nombre tiene?"
-#          type: "textarea" #type of html field we are going to display
-#          classes: "someclass"
-#        password:
-#          callbacks: #callbacks to be executed when model is saved (list on CallbacksTrait file)
-#            - "crypt"
-#    "multilanguage_fields":
-#      - name
-#    related_models: ["note"]
-
+entities:
   user:
     schema:
-      "nice_name": "Usuarios" #name to show on backoffice navigator list
+      icon: users
+      nice_name: "Usuarios" #name to show on backoffice navigator list
       public: false #used to show in public (visitors)
-      "by_user": false #if true, logged user id will be added to post data when model is saved on sheet
+      by_user: false #if true, logged user id will be added to post data when model is saved on sheet
+      user_can_create: true
+      visible_in_navbar: false
     fields:
       in_list: #fields to show on backoffice list page
         - email
         - name
-        - created_at
+        - createdAt
       in_detail: #fields to show on detail page
         - email
         - name
         - password
-        - created_at
+        - createdAt
       fillable: #campos rellenables, tanto en la creacion como en la edicion
         - email
         - name
@@ -85,3 +54,40 @@ models:
     "multilanguage_fields":
       - name
 #    related_models: ["note"]
+
+
+  author:
+    schema:
+      nice_name: "Authors"
+      icon: pencil
+      public: rtue
+
+  post:
+    schema:
+        nice_name: "Posts"
+        icon: paste
+        public: true
+        by_user: false
+        user_can_create: true
+    fields:
+      in_search:
+        - uuid
+        - title
+        - author.name
+        - comment.visitor.name
+      in_list:
+        - uuid
+        - title
+        - content
+        - author.name
+        - comment.visitor.name
+
+  visitor:
+    schema:
+      nice_name: "Visitors"
+      icon: user-md
+
+  comment:
+    schema:
+      nice_name: "Comments"
+      icon: comment

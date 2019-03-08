@@ -160,9 +160,9 @@ class Request
         ]);
 
         try {
-            if (isset($this->data['multipart'])) {
+            if (isset($this->data->multipart)) {
                 // There is a file to be sent
-                foreach ($this->data['multipart'] as $key => $file) {
+                foreach ($this->data->multipart as $key => $file) {
                     $file_data = [
                         'name'      => $key . '##' . $file['persistence']['repository'] . '|' . $file['persistence']['parameters']['folder'],
                         'contents'  => $file['content'],
@@ -171,19 +171,19 @@ class Request
                     $this->options['multipart'][] = $file_data;
                 }
 
-                foreach ($this->data['post'] as $key => $value) {
+                foreach ($this->data->post as $key => $value) {
                     $field_data = [
                         'name'      => $key,
                         'contents'  => $value,
                     ];
                     $this->options['multipart'][] = $field_data;
                 }
-            } elseif (isset($this->data['post'])) {
-                $this->options['form_params'] = $this->data['post'];
+            } elseif (isset($this->data->post)) {
+                $this->options['form_params'] = $this->data->post;
             }
 
-            if (isset($this->data['uri']) && count($this->data['uri']) > 0) {
-                $this->url .= '/' . implode('/', $this->data['uri']);
+            if (isset($this->data->uri) && count($this->data->uri) > 0) {
+                $this->url .= '/' . implode('/', $this->data->uri);
             }
 
             $this->url .= '?';
@@ -191,8 +191,8 @@ class Request
             if ($user = $session->get(LoginController::VAR_SESSION_NAME)) {
                 $this->url .= '&user_id=' . $user['uuid'];
             }*/
-            if (isset($this->data['get']) && count($this->data['get']) > 0) {
-                $this->url .= '&' . http_build_query($this->data['get']);
+            if (isset($this->data->get) && count($this->data->get) > 0) {
+                $this->url .= '&' . http_build_query($this->data->get);
             }
             if ($this->event != null) {
                 $this->url .= '?log_event=' . $this->event;
@@ -204,6 +204,7 @@ class Request
                 $this->options
             );
 
+            #request has been sent, clean it
             unset($this->data);
         } catch (\Throwable $throwable) {
             throw new \Exception($throwable);

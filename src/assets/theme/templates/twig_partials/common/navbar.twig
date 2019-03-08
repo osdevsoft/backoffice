@@ -17,18 +17,18 @@
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
-            {% for model_item in models_list|keys %}
-                {% if models_list[model_item]['schema']['visible_in_navbar'] is null or models_list[model_item]['schema']['visible_in_navbar'] == true %}
+            {% for entity in entities_list|keys %}
+                {% if entities_list[entity]['schema']['visible_in_navbar'] is null or entities_list[entity]['schema']['visible_in_navbar'] == true %}
 
-                    {% if models_list[model_item].schema is not null and models_list[model_item].schema.nice_name is not null %}
-                        {% set model_name =  models_list[model_item].schema.nice_name %}
+                    {% if entities_list[entity].schema is not null and entities_list[entity].schema.nice_name is not null %}
+                        {% set model_name =  entities_list[entity].schema.nice_name %}
                     {% else %}
-                        {% set model_name =  model_item %}
+                        {% set model_name =  entity %}
                     {% endif %}
 
-                    <li {% if model_item == model %}class="active"{% endif %}>
-                        <a href="/{{ backoffice_folder }}/{{ model_item }}">
-                            <i class="fa fa-{{ models_list[model_item].schema.icon }}"></i>
+                    <li {% if entity == model %}class="active"{% endif %}>
+                        <a href="/{{ backoffice_folder }}/{{ entity }}">
+                            <i class="fa fa-{{ entities_list[entity].schema.icon }}"></i>
                             <span>{{ model_name }}</span>
                         </a>
 

@@ -49,14 +49,15 @@ class BaseUIController
      *     methods={"GET"}
      * )
      */
-    public function __construct()
+    public function __construct(
+        Session $session)
     {
         #console request
-        if (!isset($_SERVER['REQUEST_URI'])) {
-            return true;
-        }
+        #if (!isset($_SERVER['REQUEST_URI'])) {
+        #    return true;
+        #}
         try {
-            $this->session = new Session();
+            $this->session = $session;
 
             if (#is not in Backoffice login page
                 !strstr($_SERVER['REQUEST_URI'], 'login')
@@ -66,17 +67,8 @@ class BaseUIController
                 //$this->redirect(self::PAGES['session']['login']);
             }
 
-            $this->request = new \stdClass();
-            $this->request->parameters = (isset($_REQUEST))?$_REQUEST:null;
+            $this->build();
 
-            if (!empty($_FILES)) {
-                $this->request->files = $_FILES;
-            }
-
-            $this->config['domain_structure'] = loadSiteConfiguration();
-
-            $this->models = $this->config['domain_structure']['models'];
-            
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -86,11 +78,16 @@ class BaseUIController
     public function build()
     {
         $this->request = new \stdClass();
-        $this->request->parameters = (isset($_REQUEST))?$_REQUEST:null;
+        $this->request->parameters = new \stdClass();
+        $this->request->parameters->get = (isset($_GET))?$_GET:null;
+        $this->request->parameters->post = (isset($_POST))?$_POST:null;
 
         if (!empty($_FILES)) {
             $this->request->files = $_FILES;
         }
+
+        $this->config['domain_structure'] = loadSiteConfiguration();
+        $this->entities = $this->config['domain_structure']['entities'];
     }
 
     public static function checkAuth($session)
@@ -133,12 +130,12 @@ class BaseUIController
         return $referenced_contents;
     }
 
-    private function preTreatBeforeSaving($model)
+    private function preTreatBeforeSaving($entity)
     {
         #treat field before saving it
-        if(isset($this->config['domain_structure']['models'][$model]['fields']['fields_schema']))
+        if(isset($this->entities[$entity]['fields']['fields_schema']))
         {
-            foreach($this->config['domain_structure']['models'][$model]['fields']['fields_schema'] as $field => $field_schema)
+            foreach($this->entities[$entity]['fields']['fields_schema'] as $field => $field_schema)
             {
                 #this field has callbacks, call them
                 if(isset($this->request_data['post'][$field]) && isset($field_schema['callbacks']))
@@ -164,8 +161,8 @@ class BaseUIController
 
         #if model has user_id field, fill it with session_id
         if(
-            isset($this->config['domain_structure']['models'][$model]['schema']['by_user'])
-            && $this->config['domain_structure']['models'][$model]['schema']['by_user'] == true
+            isset($this->entities[$entity]['schema']['by_user'])
+            && $this->entities[$entity]['schema']['by_user'] == true
         )
         {
             $session_data = $this->session->get(BaseUIController::var_session_name);
@@ -191,17 +188,17 @@ class BaseUIController
         }
     }
 
-    private function preTreatDataBeforeDisplaying($model, $data, $localize = false)
+    protected function preTreatDataBeforeDisplaying($entity, $data, $localize = false)
     {
 
         if (@count($data['items']) > 0) {
 
             #treat multilanguage fields
             if (isset($this->config['domain_structure']['languages'])
-                && isset($this->config['domain_structure']['models'][$model]['schema']['multilanguage_fields'])
+                && isset($this->config['domain_structure']['models'][$entity]['schema']['multilanguage_fields'])
             ) {
                 foreach ($data['items'] as &$item) {
-                    foreach ($this->config['domain_structure']['models'][$model]['schema']['multilanguage_fields'] as $ml_field) {
+                    foreach ($this->config['domain_structure']['models'][$entity]['schema']['multilanguage_fields'] as $ml_field) {
                         $item[$ml_field] = json_decode($item[$ml_field], true);
                         #preserve only a desired language
                         if ($localize

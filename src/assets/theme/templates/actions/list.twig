@@ -2,27 +2,27 @@
 
 {% block contents %}
 
-{% if models_list[model]['fields']['in_list']|length > 0 %}
-    {% set model_viewable_fields = models_list[model]['fields']['in_list'] %}
+{% if entities_list[entity]['fields']['in_list']|length > 0 %}
+    {% set entity_viewable_fields = entities_list[entity]['fields']['in_list'] %}
 {% else %}
-    {% set model_viewable_fields = data[0]|keys %}
+    {% set entity_viewable_fields = data[0]|keys %}
 {% endif %}
 
 
-{% if models_list[model]['fields']['in_search']|length > 0 %}
-    {% set entity_searchable_fields = models_list[model]['fields']['in_search'] %}
+{% if entities_list[entity]['fields']['in_search']|length > 0 %}
+    {% set entity_searchable_fields = entities_list[entity]['fields']['in_search'] %}
 {% else %}
-    {% set entity_searchable_fields = model_viewable_fields %}
+    {% set entity_searchable_fields = entity_viewable_fields %}
 {% endif %}
 
-{% if models_list[model]['fields']['fields_schema']|length > 0 %}
-    {% set model_fields_schema = models_list[model]['fields']['fields_schema'] %}
+{% if entities_list[entity]['fields']['fields_schema']|length > 0 %}
+    {% set model_fields_schema = entities_list[entity]['fields']['fields_schema'] %}
 {% else %}
     {% set model_fields_schema = null %}
 {% endif %}
 
-{% if models_list[model]['schema']|length > 0 %}
-    {% set model_schema = models_list[model]['schema'] %}
+{% if entities_list[entity]['schema']|length > 0 %}
+    {% set model_schema = entities_list[entity]['schema'] %}
 {% else %}
     {% set model_schema = null %}
 {% endif %}
@@ -42,8 +42,8 @@
 
 <section class="content">
 {% include 'twig_partials/list/finder.twig' with {
-    'model_name': model,
-    'models_metadata': models_metadata
+    'entity_name': entity,
+    'entity_metadata': entity_metadata
 }
 %}
 
@@ -71,7 +71,7 @@
         <table class="table table-striped">
             <thead>
 
-                {% for field in model_viewable_fields %}
+                {% for field in entity_viewable_fields %}
 
 
                 <th>
@@ -92,7 +92,7 @@
             {% for item in data %}
 
                 <tr>
-                    {% for field in model_viewable_fields %}
+                    {% for field in entity_viewable_fields %}
 
                         {% set printed = false %}
                         {% if '.' in field %}
@@ -135,10 +135,10 @@
                             {% endif %}
 
                             <td>
-                                {% if models_metadata[model][field] is not null %}
+                                {% if models_metadata[entity][field] is not null %}
                                     {#field nice value is defined on model metadata#}
                                     {% set printed = true %}
-                                    {{ models_metadata[model][field]['by_id'][item[field]] }}
+                                    {{ models_metadata[entity][field]['by_id'][item[field]] }}
                                 {% else %}
                                     {# it's a non fillable field #}
 
@@ -184,5 +184,19 @@
 
 
 </section>
+
+<script>
+    $('.content-listing tr').on('click', function(e) {
+        if(e.originalEvent.originalTarget.localName != 'a')
+        {
+            window.location.href = $($(this).find('td.actions a')[0]).attr('href');
+        }
+    })
+    function check_delete(model, id) {
+        if(confirm('{{ locale['Are you sure you want to delete this entry?'] }}')) {
+            window.location.href = '/{{ backoffice_folder }}/' + model + '/delete/' + id;
+        }
+    }
+</script>    
 
 {% endblock %}

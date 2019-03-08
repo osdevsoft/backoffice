@@ -16,11 +16,11 @@
                     {% for field in entity_searchable_fields %}
 
                         {% if '.' in field %}
-                        {# it's a field from a related model #}
+                        {# it's a field from a referenced model #}
                             {% set field_info = field|split(".") %}
-                            {% set model_metadata_values = models_metadata[field_info[0]][field_info[1]] %}
+                            {% set model_metadata_values = entity_metadata[field_info[0]][field_info[1]] %}
                         {% else %}
-                            {% set model_metadata_values = models_metadata[model_name][field] %}
+                            {% set model_metadata_values = entity_metadata[model_name][field] %}
                         {% endif %}
 
                         {# field has been searched previously. Get its searched value #}

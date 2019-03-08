@@ -13,9 +13,8 @@ final class SearchEntityUseCase
 
     public function execute($entity, $requestParameters)
     {
-        $request_parameters = $requestParameters;
 
-        $request = new Request($entity, 'get', $request_parameters);
+        $request = new Request($entity, 'get', $requestParameters);
         $response = $request->sendRequest();
 
         return $response;
