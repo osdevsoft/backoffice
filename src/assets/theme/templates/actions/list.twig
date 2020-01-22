@@ -30,10 +30,12 @@
 {% if model_schema is not null and model_schema.nice_name is not null %}
     {% set model_nice_name = model_schema.nice_name %}
 {% else %}
-    {% set model_nice_name = model %}
+    {% set model_nice_name = entity %}
 {% endif %}
 
-{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/create' %}
+{% set model = entity %}
+
+{% set form_action = '/' ~ model ~ '/create' %}
 
 
 <section class="content-header">
@@ -59,7 +61,7 @@
         </h3>
         <div class="box-tools">
             {% if model_schema.user_can_create is null or model_schema.user_can_create == true %}
-                <a class="btn btn-info" href="/{{ backoffice_folder }}/{{ model }}/create">{{ locale['Create new'] }}</a>
+                <a class="btn btn-info" href="/{{ model }}/create">{{ locale['Create new'] }}</a>
             {% endif %}
         </div>
 
@@ -80,8 +82,8 @@
                         {% else %}
                             {{ field|replace({'.': ' ', '_': " "}) }}
                         {% endif %}
-                        <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=asc&{{ query_string_search_fields }}">&#8679;</a>
-                        <a href="/{{ backoffice_folder }}/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=desc&{{ query_string_search_fields }}">&#8681;</a>
+                        <a href="/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=asc&{{ query_string_search_fields }}">&#8679;</a>
+                        <a href="/{{ model }}/?query_filters[sortby][0][field]={{ field }}&query_filters[sortby][0][dir]=desc&{{ query_string_search_fields }}">&#8681;</a>
                     </th>
                 {% endfor %}
                 <th>{{ locale['Actions'] }}</th>
@@ -167,7 +169,7 @@
                         {% endif %}
                     {% endfor %}
                     <td class="actions">
-                        <a data-qa="{{ locale['View'] }}" href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item.id }}">[{{ locale['View'] }}]</a>
+                        <a href="/{{ model }}/{{ item.uuid }}">[{{ locale['View'] }}]</a>
                         {#<a onclick="check_delete('{{ model }}', {{ item.id }})" href="#">[{{ locale['Delete'] }}]</a>#}
                     </td>
                 </tr>
@@ -194,7 +196,7 @@
     })
     function check_delete(model, id) {
         if(confirm('{{ locale['Are you sure you want to delete this entry?'] }}')) {
-            window.location.href = '/{{ backoffice_folder }}/' + model + '/delete/' + id;
+            window.location.href = '/' + model + '/delete/' + id;
         }
     }
 </script>    

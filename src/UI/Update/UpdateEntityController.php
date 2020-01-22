@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
 /**
- * @Route("/backoffice")
+ * @Route("/")
  */
 class UpdateEntityController extends BaseUIController
 {
@@ -25,7 +25,7 @@ class UpdateEntityController extends BaseUIController
      * Updates an item from the received data and redirects to the view or the list, if it fails
      *
      * @Route(
-     *     "/{entity}/{uuid}",
+     *     "/{entity}/edit/{uuid}",
      *     methods={"PUT"}
      * )
      *

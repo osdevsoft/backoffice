@@ -12,9 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use function Osds\Backoffice\Utils\loadSiteConfiguration;
 
 
-/**
- * @Route("/backoffice")
- */
 class BaseUIController
 {
 
@@ -42,13 +39,7 @@ class BaseUIController
 
     public $commands_path = '\Osds\Backoffice\Application\Commands\%action%%model%Command';
 
-    /**
-     *
-     * @Route(
-     *     "",
-     *     methods={"GET"}
-     * )
-     */
+
     public function __construct(
         Session $session)
     {
@@ -117,7 +108,7 @@ class BaseUIController
      *
      * @return array
      */
-    private function getReferencedContents($schema_info = null, $model = null)
+    protected function getReferencedContents($schema_info = null, $model = null)
     {
         if($schema_info == null)
         {
@@ -130,7 +121,7 @@ class BaseUIController
         return $referenced_contents;
     }
 
-    private function preTreatBeforeSaving($entity)
+    protected function preTreatBeforeSaving($entity)
     {
         #treat field before saving it
         if(isset($this->entities[$entity]['fields']['fields_schema']))

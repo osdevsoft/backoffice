@@ -1,0 +1,47 @@
+services:
+
+    Session:
+        class: Osds\Backoffice\UI\Helpers\Session
+        autowire: true
+
+    Osds\Backoffice\UI\BaseUIController:
+        autowire: true
+        arguments:
+            - "@Session"
+        tags: ['controller.service_arguments']
+
+    Osds\Backoffice\UI\Login\ShowLoginFormController:
+        autowire: true
+        arguments:
+            - "@Session"
+        tags: ['controller.service_arguments']
+    Osds\Backoffice\UI\Login\PostLoginFormController:
+        autowire: true
+        tags: ['controller.service_arguments']
+
+
+    Osds\Backoffice\UI\HomeController:
+        autowire: true
+        arguments:
+            - "@Session"
+        tags: ['controller.service_arguments']
+
+    Osds\Backoffice\UI\Search\SearchEntityController:
+        autowire: true
+        arguments:
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
+            - "@Session"
+        tags: ['controller.service_arguments']
+    Osds\Backoffice\Application\Search\SearchEntityQueryBus:
+        autowire: true
+    Osds\Backoffice\Application\Search\SearchEntityQueryHandler:
+        autowire: true
+    Osds\Backoffice\Application\Search\SearchEntityUseCase:
+        autowire: true
+
+    Osds\Backoffice\UI\Search\FindEntityController:
+        autowire: true
+        arguments:
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
+            - "@Session"
+        tags: ['controller.service_arguments']

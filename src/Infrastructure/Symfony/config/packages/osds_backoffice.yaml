@@ -1,7 +1,2 @@
-services:
-    Illuminate\Http\Request:
-        autowire: true
-
-    Osds\Backoffice\UI\Login\ShowLoginFormController:
-        autowire: true
-        tags: ['controller.service_arguments']
+imports:
+  - ../../vendor/osds/backoffice/src/Infrastructure/Symfony/config/packages/osds/*

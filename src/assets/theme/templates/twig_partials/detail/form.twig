@@ -1,73 +1,79 @@
-{%  set model = models_list[model_name]%}
+{%  set entity = entities_list[entity]%}
 
-{% if model['fields']['in_detail']|length > 0 %}
-    {% set model_viewable_fields = model['fields']['in_detail'] %}
+{% if entity['fields']['in_detail']|length > 0 %}
+    {% set entity_viewable_fields = entity['fields']['in_detail'] %}
 {% else %}
-    {% set model_viewable_fields = data|keys %}
+    {% set entity_viewable_fields = data|keys %}
 {% endif %}
 
-{% if model['fields']['fillable']|length > 0 %}
-    {% set model_fillable_fields = model['fields']['fillable'] %}
+{% if entity['fields']['fillable']|length > 0 %}
+    {% set entity_fillable_fields = entity['fields']['fillable'] %}
 {% else %}
-    {% set model_fillable_fields = null %}
+    {% set entity_fillable_fields = null %}
 {% endif %}
 
-{% if model['fields']['fields_schema']|length > 0 %}
-    {% set model_fields_schema = model['fields']['fields_schema'] %}
+{% if entity['fields']['fields_schema']|length > 0 %}
+    {% set entity_fields_schema = entity['fields']['fields_schema'] %}
 {% else %}
-    {% set model_fields_schema = null %}
+    {% set entity_fields_schema = null %}
 {% endif %}
 
-<form id="detail_submit" action="{{ form_action }}" method="post" enctype="multipart/form-data">
-    <input data-qa="{{ locale['Save'] }}" class="btn btn-primary" type="submit" value="{{ locale['Save'] }}">
 
-    {% if GET is not null and GET.creation_vars is not null and GET.creation_vars is iterable %}
-    {% for key, value in GET.creation_vars %}
-    <input data-qa="{{ key }}" type="hidden" name="{{ key }}" value="{{ value }}" />
-    {% endfor %}
-{% endif %}
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Content</h3>
+    </div>
 
-<table class="dashed-group" width="100%">
-    {% for field in model_viewable_fields %}
+    <form id="detail_submit" action="{{ form_action }}" method="post" enctype="multipart/form-data" role="form">
 
-        {% if field != 'relations' %}
+        {% if GET is not null and GET.creation_vars is not null and GET.creation_vars is iterable %}
+            {% for key, value in GET.creation_vars %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}" />
+            {% endfor %}
+        {% endif %}
 
-            {% if model_fields_schema is not null and model_fields_schema[field] is not null  %}
-                {# field has specific settings #}
-                {% set field_info = model_fields_schema[field] %}
-            {% else %}
-                {% set field_info = null %}
-            {% endif %}
+        <div class="box-body">
 
-            <tr>
-                <td>
-                    {#display field name #}
-                    {% set model_field = model_name ~ '.' ~ field %}
-                    {% if model_fields_schema[field].nice_name is not null %}
-                        {{ model_fields_schema[field].nice_name }}
+        {% for field in entity_viewable_fields %}
+            <div class="form-group">
+
+            {% if field != 'references' %}
+
+                {% if entity_fields_schema is not null and entity_fields_schema[field] is not null  %}
+                    {# field has specific settings #}
+                    {% set field_info = entity_fields_schema[field] %}
+                {% else %}
+                    {% set field_info = null %}
+                {% endif %}
+
+
+                {% if field_info.tooltip is not null %}
+                    {# display a tooltip #}
+                    <span title="{{ field_info.tooltip }}" style="cursor: default; font-size: 1.5em; color: royalblue">&#9432;</span>
+                {% endif %}
+
+                {#display field name #}
+                <label for="{{ field }}">
+                    {% set entity_field = entity_name ~ '.' ~ field %}
+                    {% if entity_fields_schema[field].nice_name is not null %}
+                        {{ entity_fields_schema[field].nice_name }}
                     {% else %}
                         {{ field|replace({'.': ' ', '_': " "}) }}
                     {% endif %}
-                    {% if field_info.tooltip is not null %}
-                        {# display a tooltip #}
-                        <span title="{{ field_info.tooltip }}" style="cursor: default; font-size: 1.5em; color: royalblue">&#9432;</span>
-                    {% endif %}
-                </td>
+                </label>
+                {% if entity.schema.multilanguage_fields is not null and field in entity.schema.multilanguage_fields %}
 
-                <td>
-                    {% if model.schema.multilanguage_fields is not null and field in model.schema.multilanguage_fields %}
-
-                        {% for language in config.domain_structure.languages %}
-
-                            <br><b>{{ language|upper }}</b><br>
+                    {% for language in config.domain_structure.languages %}
+                        <div style="margin-left: 20px">
+                            <b>{{ language|upper }}</b><br>
                             {% include 'twig_partials/detail/form_element.twig' with {
                                                 'language': language,
                                                 'language_array': '[' ~ language ~ ']',
                                                 'data': data,
                                                 'config': config,
-                                                'model_name': model_name,
-                                                'models_list': models_list,
-                                                'models_metadata': models_metadata,
+                                                'entity_name': entity_name,
+                                                'entities_list': entities_list,
+                                                'entities_metadata': entities_metadata,
                                                 'is_field_fillable': is_field_fillable,
                                                 'field': field,
                                                 'field_info': field_info,
@@ -75,39 +81,40 @@
                                                 'theme_blocks_json': theme_blocks_json
                                         }
                             %}
+                        </div>
 
 
-                        {% endfor %}
+                    {% endfor %}
 
-                    {% else %}
+                {% else %}
 
-                        {% include 'twig_partials/detail/form_element.twig' with {
-                        'data': data,
-                        'config': config,
-                        'model_name': model_name,
-                        'models_list': models_list,
-                        'models_metadata': models_metadata,
-                        'is_field_fillable': is_field_fillable,
-                        'field': field,
-                        'field_info': field_info,
-                        'editable_referenced_models_contents': editable_referenced_models_contents,
-                        'theme_style_sheet': theme_style_sheet,
-                        'theme_blocks_json': theme_blocks_json
-                        }
-                        %}
+                    {% include 'twig_partials/detail/form_element.twig' with {
+                    'data': data,
+                    'config': config,
+                    'entity_name': entity_name,
+                    'entities_list': entities_list,
+                    'entities_metadata': entities_metadata,
+                    'is_field_fillable': is_field_fillable,
+                    'field': field,
+                    'field_info': field_info,
+                    'editable_referenced_entities_contents': editable_referenced_entities_contents,
+                    'theme_style_sheet': theme_style_sheet,
+                    'theme_blocks_json': theme_blocks_json
+                    }
+                    %}
 
-                    {% endif %}
+                {% endif %}
 
-                </td>
+            </div>
 
-            </tr>
+            {% endif %}
 
-        {% endif %}
+        {% endfor %}
+        </div>
 
-    {% endfor %}
+        <div class="box-footer">
+            <button type="submit" class="btn btn-primary">{{ locale['Save'] }}</button>
+        </div>
 
-
-</table>
-<br />
-<input data-qa="{{ locale['Save'] }}" class="btn btn-primary" type="submit" value="{{ locale['Save'] }}">
-</form>
+    </form>
+</div>

@@ -25,8 +25,6 @@ function redirect($url, $result = null, $message = null, $error = null)
 {
     $locale = $this->loadLocalization($this->vendor_path . '/assets/localization/');
 
-    $url = '/' . getenv('BACKOFFICE_FOLDER') . $url;
-
     if ($message != null) {
         if (isset($locale[strtoupper($message)])) {
             $message = $locale[strtoupper($message)];

@@ -7,7 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
 /**
- * @Route("/backoffice")
+ * @Route("/")
  */
 class ShowFormEntityController extends BaseUIController
 {
@@ -36,7 +36,7 @@ class ShowFormEntityController extends BaseUIController
         $this->build();
 
         #we need them in order to get mandatory references (foreign relations)
-        $data['twig_vars'] = $this->getReferencedContents([], $model);
+        $data['twig_vars'] = $this->getReferencedContents([], $entity);
         return $this->generateView($data, 'create');
 
     }

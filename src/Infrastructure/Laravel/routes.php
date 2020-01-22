@@ -1,12 +1,10 @@
 <?php
 
-$backoffice_folder = getenv('BACKOFFICE_FOLDER');
+$backoffice_folder = '/';
 
 if (is_null($backoffice_folder)) {
     $backoffice_folder = '/';
 }
-
-define('BACKOFFICE_FOLDER', $backoffice_folder);
 
 Route::get($backoffice_folder, [
     'uses' => '\Osds\Backoffice\Application\Controllers\BackofficeController@index',

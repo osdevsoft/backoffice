@@ -1,8 +1,8 @@
 {% set printed = false %}
-{% set referenced_model = null %}
+{% set referenced_entity = null %}
 {% set referenced_field = null %}
 
-{% if field in model_fillable_fields %}
+{% if field in entity_fillable_fields %}
     {% set is_field_fillable = true %}
 {% else %}
     {% set is_field_fillable = false %}
@@ -20,7 +20,7 @@
 
 {% if '.' in field %}
     {% set field_value = null %}
-    {#field from a referenced model, split to parse all levels #}
+    {#field from a referenced entity, split to parse all levels #}
     {% set referenced_field_data = field|split('.') %}
 
     {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
@@ -29,8 +29,8 @@
         {% set entity_or_field_name = referenced_field_data[i] %}
         {% if i != (referenced_field_data|length - 1) %}
             {# it's not the last element => it's an entity #}
-            {% set data = data['relations'][entity_or_field_name]['items'][0] %}
-            {% set referenced_model = entity_or_field_name %}
+            {% set data = data['references'][entity_or_field_name][0] %}
+            {% set referenced_entity = entity_or_field_name %}
         {% else %}
             {# it's the last element => it's the field => get the value #}
             {% set field_value = data[entity_or_field_name] %}
@@ -46,32 +46,32 @@
 {% if is_field_fillable %}
     {# value can be modified #}
 
-    {# check if it's a value from a foreign model #}
-    {% if referenced_model is not null %}
+    {# check if it's a value from a foreign entity #}
+    {% if referenced_entity is not null %}
         {% set printed = true %}
 
-        <select style="width:100%" data-qa="{{ referenced_model ~ '_id' }}" name="{{ referenced_model ~ '_id' }}"
+        <select class="form-control" style="width:100%" name="{{ referenced_entity ~ '_uuid' }}"
                 {% if field_info is not null and field_info.type == "select-finder" %}
                     data-placeholder="Choose an area..." class="chosen-select"
                 {% endif %}
         >
             <option value="DB_NULL"></option>
-            {% for referenced_item_data in editable_referenced_models_contents[referenced_model].items %}
-                {% if referenced_item_data[models_list[referenced_model].fields.in_list[0]] is iterable %}
+            {% for referenced_item_data in editable_referenced_entities_contents[referenced_entity].items %}
+                {% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}
                     {# it's multilanguage #}
                     {% set field_value = referenced_item_data[referenced_field][config.domain_structure.language] %}
                 {% else %}
                     {% set field_value = referenced_item_data[referenced_field] %}
                 {% endif %}
 
-                {# little hack: if referenced model is self (static_pages parents eg), do not show self id #}
-                {% if model_name == referenced_model and referenced_item_data['id'] == data['id'] %}
+                {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
+                {% if entity_name == referenced_entity and referenced_item_data['id'] == data['id'] %}
                     {#nothing to do, it's self#}
                 {% else %}
                     <option
                             value="{{ referenced_item_data['id'] }}"
                             {% if referenced_item_data['id'] == data['id'] %} selected="selected"{% endif %}
-                    >{{ data[referenced_model ~ '_id'] }}{{ field_value }}</option>
+                    >{{ data[referenced_entity ~ '_id'] }}{{ field_value }}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -80,8 +80,7 @@
             {% if field_info.type == "select-finder" %}
                 <script type="text/javascript">
                     $(function () {
-                        console.log('dfgfgf');
-                        $('[name="{{ referenced_model ~ '_id' }}"]').chosen();
+                        $('[name="{{ referenced_entity ~ '_id' }}"]').chosen();
                     });
                 </script>
             {% endif %}
@@ -99,7 +98,7 @@
                 {% if field_info.type == "textarea" %}
                     {% if 'richtext' in field_info.classes %}
                         {% set printed = true %}
-                        <textarea id="richtext_{{ field }}{{ language_array }}" data-qa="{{ field }}" name="{{ field }}{{ language_array }}" class="{{ classes }}">
+                        <textarea id="richtext_{{ field }}{{ language_array }}" name="{{ field }}{{ language_array }}" class="{{ classes }}">
                             {{ field_value }}
                         </textarea>
                         <script>
@@ -123,11 +122,11 @@
                 {% elseif field_info.type == "file" %}
                     {% set printed = true %}
                     {{ field_value }}
-                    <input type="file" data-qa="{{ field }}" name="{{ field }}" />
+                    <input class="form-control"  type="file" name="{{ field }}" />
 
                 {% elseif field_info.type == "date" %}
                     {% set printed = true %}
-                    <input type="text" id="{{ field }}" data-qa="{{ field }}" name="{{ field }}" value="{{ field_value }}" class="datetime-picker" />
+                    <input class="form-control" type="text" id="{{ field }}" name="{{ field }}" value="{{ field_value }}" class="datetime-picker" />
                     <script>
                         // https://flatpickr.js.org/
                         $(function () {
@@ -147,15 +146,16 @@
 
         {% if not printed %}
             {# not any specific info for this field #}
-            <input type="text" data-qa="{{ field }}" size=50 name="{{ field }}{{ language_array }}" value="{{ field_value }}" />
+            <input class="form-control" type="text" size=50 name="{{ field }}{{ language_array }}" value="{{ field_value }}" />
         {% endif %}
 
     {% endif %}
 {% else %}
+    <br />
     {# field not fillable, display as text #}
-    {% if models_metadata[model_name][field] is not null %}
-        {#field nice value is defined on model metadata#}
-        {{ models_metadata[model_name][field]['by_id'][data[field]] }}
+    {% if entities_metadata[entity_name][field] is not null %}
+        {#field nice value is defined on entity metadata#}
+        {{ entities_metadata[entity_name][field]['by_id'][data[field]] }}
     {% else %}
         {% if field_value is iterable %}
             <ul>
@@ -185,7 +185,7 @@
             {% if field_info is not null %}
                 {% if field_info.type == "s3_image" %}
                     <a href="{{ field_value }}" target="_blank" style="position:absolute;right:5%;border:1px solid grey;">
-                        <img data-qa="{{ field }}" src="{{ field_value }}" style="float:right;height:150px;"/>
+                        <img src="{{ field_value }}" style="float:right;height:150px;"/>
                     </a>
                 {% endif %}
             {% else %}

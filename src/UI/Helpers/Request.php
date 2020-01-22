@@ -73,7 +73,7 @@ class Request
      */
     public function setUrl($url)
     {
-        $this->url = '/api/' . $url;
+        $this->url = $url;
     }
 
     /**

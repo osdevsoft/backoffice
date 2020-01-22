@@ -28,7 +28,7 @@
     <h4>{{ model }} ({{ relations_data[model]['total_items'] }})</h4>
     {% if referenced_fields[model].is_referenced == false %}
         <div class="new-entry">
-            <a href="/{{ backoffice_folder }}/{{ model }}/create/?creation_vars[{{ parent_model }}_id]={{ parent_id }}">
+            <a href="/{{ model }}/create/?creation_vars[{{ parent_model }}_id]={{ parent_id }}">
                 {{ locale['Create new'] }} {{ model }} {{ locale['for this element'] }}
             </a>
         </div>
@@ -83,7 +83,7 @@
                         </td>
                     {% endfor %}
                     <td class="actions">
-                        <a href="/{{ backoffice_folder }}/{{ model }}/edit/{{ item['id'] }}">[{{ locale['View'] }}]</a>
+                        <a href="/{{ model }}/edit/{{ item['id'] }}">[{{ locale['View'] }}]</a>
                         {#<a onclick="check_delete('{{ model }}', {{ item['id'] }})" href="#">[{{ locale['Delete'] }}]</a>#}
                     </td>
                 </tr>

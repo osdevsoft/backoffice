@@ -1,36 +1,40 @@
 {% extends 'layout.twig' %}
 
-{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model_name ~ '/edit/' ~ data.id %}
+{% set form_action = '/' ~ entity ~ '/edit/' ~ data[0].uuid %}
 
-{% if models_list[model]['schema']|length > 0 %}
-    {% set model_schema = models_list[model]['schema'] %}
+{% if entities_list[entity]['schema']|length > 0 %}
+    {% set entity_schema = entities_list[entity]['schema'] %}
 {% else %}
-    {% set model_schema = null %}
+    {% set entity_schema = null %}
 {% endif %}
 
-{% if model_schema is not null and model_schema.nice_name is not null %}
-    {% set model_nice_name = model_schema.nice_name %}
+{% if entity_schema is not null and entity_schema.nice_name is not null %}
+    {% set entity_nice_name = entity_schema.nice_name %}
 {% else %}
-    {% set model_nice_name = model %}
+    {% set entity_nice_name = entity %}
 {% endif %}
-
-{% set form_action = '/' ~ backoffice_folder ~ '/' ~ model ~ '/edit/' ~ data[0]['id'] %}
 
 {% block contents %}
 
-    <h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
+    <section class="content-header">
+        <h1>{{ entity_nice_name }} :: {{ locale[action] }}</h1>
+    </section>
 
+    <section class="content">
     <div id="detail-actions">
-    {% include views.detail_actions
+    {#
+        {% include views.detail_actions
         with {
             'data': data[0],
-            'model_constants': models_metadata[model]
+            'entity_constants': entities_metadata[entity]
         }
     %}
+    #}
     </div>
+
     {% for content in data[0]['original_data']  %}
-        {% for key, value in content  %}
-            <input type="hidden" data-qa="{{ key }}" value="{{ value }}" />
+        {% for key, value in content %}
+            <input type="hidden" value="{{ value }}" />
         {% endfor %}
     {% endfor %}
 
@@ -38,22 +42,22 @@
             with {
                     'form_action': form_action,
                     'data': data[0],
-                    'models': models_list,
-                    'model_name': model,
-                    'editable_referenced_models_contents': editable_referenced_models_contents
+                    'entities': entities_list,
+                    'entity_name': entity,
+                    'editable_referenced_entities_contents': editable_referenced_entities_contents
             }
     %}
 
-    {% if models_list[model]['related_models']|length > 0 %}
-        <section id="referenced-models">
+    {% if entities_list[entity]['related_entities']|length > 0 %}
+        <section id="referenced-entities">
             <hr>
             <h3>Referenced Data</h3>
-            {% include 'twig_partials/detail/referenced_models.twig' with {
+            {% include 'twig_partials/detail/referenced_entities.twig' with {
                 'relations_data': data[0]['relations'],
-                'models': models_list,
-                'related_models': models_list[model]['related_models'],
+                'entities': entities_list,
+                'related_entities': entities_list[entity]['related_entities'],
                 'schema': schema,
-                'parent_model': model,
+                'parent_entity': entity,
                 'parent_id': data[0].id
                 }
             %}
@@ -61,15 +65,7 @@
     {% endif %}
 
     <div style="height:50px"></div>
-
-    {# Javascript to reload order detail page (parent page) #}
-    {% if model == 'voucher' %}
-        <script type="application/javascript">
-            if(window.opener != null && !window.opener.closed) {
-                window.opener.location.reload(true);
-            }
-        </script>
-    {% endif %}
+    </section>
 
 <script>
 $(document).ready(function() {

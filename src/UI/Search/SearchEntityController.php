@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
 /**
- * @Route("/backoffice")
+ * @Route("/")
  */
 class SearchEntityController extends BaseUIController
 {
@@ -24,7 +24,6 @@ class SearchEntityController extends BaseUIController
     )
     {
         $this->query_bus = $query_bus;
-
         parent::__construct($session);
     }
 
@@ -46,7 +45,7 @@ class SearchEntityController extends BaseUIController
         $data = $this->query_bus->ask($message_object);
 
         $data = $this->preTreatDataBeforeDisplaying($entity, $data);
-        return $this->generateView($entity,'list_react', $data);
+        return $this->generateView($entity,'list', $data);
 
     }
 
@@ -54,12 +53,12 @@ class SearchEntityController extends BaseUIController
     {
         if (isset($this->config)
             && isset($this->config['domain_structure'])
-            && isset($this->config['domain_structure']['models'][$entity])
-            && isset($this->config['domain_structure']['models'][$entity]['fields'])
-            && isset($this->config['domain_structure']['models'][$entity]['fields']['in_list'])
+            && isset($this->config['domain_structure']['entities'][$entity])
+            && isset($this->config['domain_structure']['entities'][$entity]['fields'])
+            && isset($this->config['domain_structure']['entities'][$entity]['fields']['in_list'])
         ) {
            #we have referenced fields to display => we have to join them to recover them
-           foreach ($this->config['domain_structure']['models'][$entity]['fields']['in_list'] as $listField) {
+           foreach ($this->config['domain_structure']['entities'][$entity]['fields']['in_list'] as $listField) {
                if (strstr($listField, '.')) {
                   $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $listField);
                }

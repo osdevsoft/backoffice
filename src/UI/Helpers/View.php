@@ -5,6 +5,7 @@ namespace Osds\Backoffice\UI\Helpers;
 use function Osds\Backoffice\Utils\getAlertMessages;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
@@ -26,7 +27,6 @@ trait View
      */
     public function generateView($entity, $view, $data = null)
     {
-        $entity = '';
 
         if (isset($data->twig_vars)) {
             $this->twig_vars = $data->twig_vars;
@@ -35,7 +35,6 @@ trait View
         }
 
         $this->twig_vars['entity'] = $entity;
-
         $this->loadTwigVariables($view, $entity, $data);
 
         $view = 'actions/' . $view;
@@ -81,8 +80,7 @@ trait View
                 $this->loadPagination($data['total_items']);
             }
         }
-
-        $this->twig_vars['backoffice_folder'] = 'backoffice';
+        $this->twig_vars['backoffice_folder'] = '/';
         $this->twig_vars['config'] = $this->config;
 
     }
@@ -107,7 +105,7 @@ trait View
 
         #templates for tinymce
 
-//        $twig_vars['theme_blocks_json'] = $this->getTemplateJSForTinyMce();
+        $this->twig_vars['theme_blocks_json'] = $this->getTemplateJSForTinyMce();
 //        $twig_vars['theme_style_sheet'] = '/styles/' . $this->config['site']['id'] . '.css';
 
         #data passed on url
@@ -273,23 +271,28 @@ trait View
      * @param $model
      * @return mixed
      */
-//    private function getTemplateJSForTinyMce()
-//    {
-//        $site_id = $this->config['site']['id'];
-//        $blocks_path = base_path('sites_configurations/' . $site_id . '/user/layout/templates/blocks/');
-//        $theme_blocks = file_get_contents($blocks_path . 'definitions.json');
-//        $theme_blocks_array = json_decode($theme_blocks, true);
-//        foreach($theme_blocks_array as &$theme_block)
-//        {
-//            if(isset($theme_block['url']))
-//            {
-//                $theme_block['content'] = file_get_contents($blocks_path . $theme_block['url']);
-//                unset($theme_block['url']);
-//            }
-//        }
-//
-//        return json_encode($theme_blocks_array);
-//    }
+    private function getTemplateJSForTinyMce()
+    {
+        $templateBlocksPath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/osds/backoffice/vendor/osds/template-blocks/assets/blocks/';
+        $templateBlocksCacheFile = $templateBlocksPath . '../tinymce_definitions.json';
+        if(
+            file_exists($templateBlocksCacheFile)
+            && !isset($_REQUEST['reloadCache'])
+        ) {
+            return file_get_contents($templateBlocksCacheFile);
+        }
+        $templateBlocksPaths = glob($templateBlocksPath . '*');
+        foreach($templateBlocksPaths as $templateBlocksPath) {
+            $config = Yaml::parsefile($templateBlocksPath . 'config.yaml');
+            $block['title'] = $config['name'];
+            $block['description'] = $config['description'];
+            $block['content'] = file_get_contents($templateBlocksPath . 'template.tpl');
+            $blocks[] = $block;
+        }
+        file_put_contents($templateBlocksCacheFile, json_encode($blocks));
+
+        return json_encode($blocks);
+    }
 
 
 

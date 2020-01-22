@@ -27,7 +27,7 @@
                     {% endif %}
 
                     <li {% if entity == model %}class="active"{% endif %}>
-                        <a href="/{{ backoffice_folder }}/{{ entity }}">
+                        <a href="/{{ entity }}">
                             <i class="fa fa-{{ entities_list[entity].schema.icon }}"></i>
                             <span>{{ model_name }}</span>
                         </a>

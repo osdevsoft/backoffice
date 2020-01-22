@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
 /**
- * @Route("/backoffice")
+ * @Route("/")
  */
 class DeleteEntityController extends BaseUIController
 {
