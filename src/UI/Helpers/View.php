@@ -37,7 +37,9 @@ trait View
         $this->twig_vars['entity'] = $entity;
         $this->loadTwigVariables($view, $entity, $data);
 
-        $view = 'actions/' . $view;
+        if(!strstr($view, '/')) {
+            $view = 'actions/' . $view;
+        }   
 
 //        if (view()->exists($entity.'/'.$method)) {
 //            $view .= $entity . '/' . $method;

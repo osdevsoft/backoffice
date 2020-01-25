@@ -21,7 +21,7 @@ class ShowLoginFormController extends BaseUIController
      */
     public function handle()
     {
-        return $this->generateView(null, 'login', 'session');
+        return $this->generateView(null, 'session/login');
     }
 
 }

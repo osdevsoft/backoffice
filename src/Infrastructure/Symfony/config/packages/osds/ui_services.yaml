@@ -1,7 +1,7 @@
 services:
 
     Session:
-        class: Osds\Backoffice\UI\Helpers\Session
+        class: Osds\DDDCommon\Infrastructure\Persistence\SessionRepository
         autowire: true
 
     Osds\Backoffice\UI\BaseUIController:
