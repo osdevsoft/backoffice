@@ -10,20 +10,10 @@
   "minimum-stability": "dev",
   "version": "1.0a",
   "require": {
-
-    "osds/template-blocks": "dev-master",
-    "osds/ddd-common": "dev-master"
-  },
-
-  "repositories": {
-    "template-blocks": {
-      "type": "vcs",
-      "url": "https://github.com/osdevsoft/template-blocks"
-    },
-    "osds-ddd-common": {
-      "type": "vcs",
-      "url": "https://github.com/osdevsoft/ddd-common"
-    }
+    "phpunit/phpunit": "^7.0",
+    "guzzlehttp/guzzle": "6.3.*",
+    "symfony/yaml": "4.2.*",
+    "doctrine/annotations": "1.6.*"
   },
 
   "autoload": {

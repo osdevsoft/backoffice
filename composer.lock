@@ -292,12 +292,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/osdevsoft/template-blocks.git",
-                "reference": "0f90cd4b6147c2da8318c287133186c6ceacf7ce"
+                "reference": "53fbe1fb7438b99c9f18332a6a72cfbe8e0723bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/osdevsoft/template-blocks/zipball/0f90cd4b6147c2da8318c287133186c6ceacf7ce",
-                "reference": "0f90cd4b6147c2da8318c287133186c6ceacf7ce",
+                "url": "https://api.github.com/repos/osdevsoft/template-blocks/zipball/53fbe1fb7438b99c9f18332a6a72cfbe8e0723bd",
+                "reference": "53fbe1fb7438b99c9f18332a6a72cfbe8e0723bd",
                 "shasum": ""
             },
             "require": {
@@ -323,7 +323,7 @@
                 "source": "https://github.com/osdevsoft/template-blocks/tree/master",
                 "issues": "https://github.com/osdevsoft/template-blocks/issues"
             },
-            "time": "2020-01-11T21:15:02+00:00"
+            "time": "2020-01-25T12:19:58+00:00"
         },
         {
             "name": "psr/http-message",
