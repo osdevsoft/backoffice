@@ -10,10 +10,7 @@
   "minimum-stability": "dev",
   "version": "1.0a",
   "require": {
-    "phpunit/phpunit": "^7.0",
-    "guzzlehttp/guzzle": "6.3.*",
-    "symfony/yaml": "4.2.*",
-    "doctrine/annotations": "1.6.*",
+
     "osds/template-blocks": "dev-master",
     "osds/ddd-common": "dev-master"
   },
