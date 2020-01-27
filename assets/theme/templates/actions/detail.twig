@@ -32,11 +32,6 @@
     #}
     </div>
 
-    {% for content in data[0]['original_data']  %}
-        {% for key, value in content %}
-            <input type="hidden" value="{{ value }}" />
-        {% endfor %}
-    {% endfor %}
 
     {% include 'twig_partials/detail/form.twig'
             with {
@@ -44,7 +39,7 @@
                     'data': data[0],
                     'entities': entities_list,
                     'entity_name': entity,
-                    'editable_referenced_entities_contents': editable_referenced_entities_contents
+                    'referenced_entities_contents': referenced_entities_contents
             }
     %}
 

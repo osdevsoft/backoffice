@@ -7,7 +7,7 @@ composer require annotations
 
 #Backoffice
 
-se debe crear el fichero de configuracion /config/backoffice/domain_structure.yml (ejemplo en src/Backoffice/Laravel/config)
+se debe crear el fichero de configuracion /config/backoffice/crm.yml (ejemplo en src/Backoffice/Laravel/config)
 
 Este proyecto es un Backoffice genérico al cual se le pueden agregar nuevos packages (o entidades)
 

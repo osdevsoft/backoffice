@@ -22,18 +22,18 @@
     {% set field_value = null %}
     {#field from a referenced entity, split to parse all levels #}
     {% set referenced_field_data = field|split('.') %}
-
+    {% set referenced_entity_data = data %}
     {# parse all components of the field name (entity.subentity.subentity.subenetity_field #}
     {% for i in 0..(referenced_field_data|length - 1) %}
         {# entity or field (we don't know which is it) until we check "i" #}
         {% set entity_or_field_name = referenced_field_data[i] %}
         {% if i != (referenced_field_data|length - 1) %}
             {# it's not the last element => it's an entity #}
-            {% set data = data['references'][entity_or_field_name][0] %}
+            {% set referenced_entity_data = referenced_entity_data['references'][entity_or_field_name][0] %}
             {% set referenced_entity = entity_or_field_name %}
         {% else %}
             {# it's the last element => it's the field => get the value #}
-            {% set field_value = data[entity_or_field_name] %}
+            {% set field_value = referenced_entity_data[entity_or_field_name] %}
             {% set referenced_field = entity_or_field_name %}
         {% endif %}
     {% endfor %}
@@ -42,36 +42,36 @@
 {% if field_value is null %}
     {% set field_value = data[field] %}
 {% endif %}
+
 {#display field value #}
 {% if is_field_fillable %}
     {# value can be modified #}
-
     {# check if it's a value from a foreign entity #}
     {% if referenced_entity is not null %}
         {% set printed = true %}
-
-        <select class="form-control" style="width:100%" name="{{ referenced_entity ~ '_uuid' }}"
+        <select class="form-control" style="width:100%" name="{{ referenced_entity ~ '.uuid' }}"
                 {% if field_info is not null and field_info.type == "select-finder" %}
-                    data-placeholder="Choose an area..." class="chosen-select"
+                    data-placeholder="..." class="chosen-select"
                 {% endif %}
         >
-            <option value="DB_NULL"></option>
-            {% for referenced_item_data in editable_referenced_entities_contents[referenced_entity].items %}
-                {% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}
+            <option value=""></option>
+            {% for referenced_item_data in referenced_entities_contents[referenced_entity] %}
+                {%  set field_value = referenced_field|getLocalizedValue(entities_list[referenced_entity].schema.multilanguage_fields, referenced_item_data[referenced_field], config.backoffice.language) %}
+                {#{% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}#}
                     {# it's multilanguage #}
-                    {% set field_value = referenced_item_data[referenced_field][config.domain_structure.language] %}
-                {% else %}
-                    {% set field_value = referenced_item_data[referenced_field] %}
-                {% endif %}
+                    {#{% set field_value = "asdf" %}#}
+                {#{% else %}#}
+                    {#{% set field_value = referenced_item_data[referenced_field] %}#}
+                {#{% endif %}#}
 
                 {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
-                {% if entity_name == referenced_entity and referenced_item_data['id'] == data['id'] %}
-                    {#nothing to do, it's self#}
+                {% if entity_name == referenced_entity and referenced_item_data['uuid'] == data['uuid'] %}
+                    {# do nothing, it's same item of same entity#}
                 {% else %}
                     <option
-                            value="{{ referenced_item_data['id'] }}"
-                            {% if referenced_item_data['id'] == data['id'] %} selected="selected"{% endif %}
-                    >{{ data[referenced_entity ~ '_id'] }}{{ field_value }}</option>
+                            value="{{ referenced_item_data['uuid'] }}"
+                            {% if referenced_item_data['uuid'] == data[referenced_entity ~ '_uuid'] %} selected="selected"{% endif %}
+                    >{{ field_value }}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -80,12 +80,11 @@
             {% if field_info.type == "select-finder" %}
                 <script type="text/javascript">
                     $(function () {
-                        $('[name="{{ referenced_entity ~ '_id' }}"]').chosen();
+                        $('[name="{{ referenced_entity ~ '_uuid' }}"]').chosen();
                     });
                 </script>
             {% endif %}
         {% endif %}
-
     {% else %}
         {# just display a form element#}
         {% if field_info is not null %}
@@ -104,7 +103,7 @@
                         <script>
                             $(document).ready(function() {
                                 tinymce.init({
-                                    'language': '{{ config.domain_structure.language }}',
+                                    'language': '{{ config.crm.language }}',
                                     content_css: "{{ theme_style_sheet }}",
                                     selector: ".richtext",
                                     height: 300,

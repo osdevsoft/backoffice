@@ -2,22 +2,24 @@
 
 namespace Osds\Backoffice\Application\Update;
 
-use Osds\Backoffice\Domain\Bus\Query\Command;
+use Osds\Backoffice\Domain\Bus\Command\Command;
 
 final class UpdateEntityCommand implements Command
 {
 
     private $entity;
-
+    private $uuid;
     private $requestParameters;
 
     public function __construct(
         string $entity,
-        Array $requestParameters
+        string $uuid,
+        $requestParameters
     )
     {
         $this->entity = $entity;
-        $this->requestParameters = $request_parameters;
+        $this->uuid = $uuid;
+        $this->requestParameters = $requestParameters;
     }
 
     public function entity(): string
@@ -25,9 +27,18 @@ final class UpdateEntityCommand implements Command
         return $this->entity;
     }
 
-    public function requestParameters(): array
+    public function uuid(): string
     {
-        return $this->requestParameters;
+        return $this->uuid;
+    }
+
+    public function requestParameters():? array
+    {
+        return [
+            'post' => $this->requestParameters,
+            'uri' => [$this->uuid]
+            ];
+//        return $this->requestParameters;
     }
 
 }

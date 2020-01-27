@@ -13,7 +13,7 @@ final class SearchEntityQuery implements Query
 
     public function __construct(
         string $entity,
-        object $request_parameters
+        array $request_parameters
     )
     {
         $this->entity = $entity;
@@ -25,7 +25,7 @@ final class SearchEntityQuery implements Query
         return $this->entity;
     }
 
-    public function requestParameters(): object
+    public function requestParameters(): array
     {
         return $this->request_parameters;
     }

@@ -131,7 +131,7 @@
                             and field in model_schema.multilanguage_fields
                             and item[field] is iterable
                             %}
-                                {% set field_value = item[field][config.domain_structure.language] %}
+                                {% set field_value = item[field][config.crm.language] %}
                             {% else %}
                                 {% set field_value = item[field] %}
                             {% endif %}

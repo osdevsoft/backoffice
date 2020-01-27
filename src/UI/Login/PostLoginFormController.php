@@ -2,12 +2,17 @@
 
 namespace Osds\Backoffice\UI\Login;
 
-use Osds\Backoffice\Application\Search\SearchEntityQuery;
+use Symfony\Component\Routing\Annotation\Route;
+use Osds\Backoffice\UI\BaseUIController;
+
+use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
+use Osds\DDDCommon\Infrastructure\View\ViewInterface;
+use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
 use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
-use Symfony\Component\Routing\Annotation\Route;
+use Osds\Backoffice\Application\Search\SearchEntityQuery;
 
-use Osds\Backoffice\UI\BaseUIController;
+use function Osds\Backoffice\Utils\redirect;
 
 /**
  * @Route("/")
@@ -18,12 +23,16 @@ class PostLoginFormController extends BaseUIController
     private $query_bus;
 
     public function __construct(
-        SearchEntityQueryBus $query_bus
+        SessionRepository $session,
+        ViewInterface $view,
+        LoadLocalizationApplication $loadLocalizationApplication,
+        SearchEntityQueryBus $queryBus
     )
     {
-        $this->query_bus = $query_bus;
+        $this->query_bus = $queryBus;
 
-        parent::__construct();
+        parent::__construct($session, $view, $loadLocalizationApplication);
+
     }
 
 
@@ -45,12 +54,12 @@ class PostLoginFormController extends BaseUIController
 
         if (isset($data)
             && $data['total_items'] == 1
-            && password_verify($this->request->parameters['password'], $data['items'][0]['password'])
+            && password_verify($this->request->parameters['post']['password'], $data['items'][0]['password'])
         ) {
-            $this->session->put(self::VAR_SESSION_NAME, $data['items'][0]);
-            $this->redirect('/user');
+            $this->session->insert(self::USER_AUTH_COOKIE, $data['items'][0]);
+            redirect('/user');
         } else {
-            $this->redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
+            redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
         }
 
     }

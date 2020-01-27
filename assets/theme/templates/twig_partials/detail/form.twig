@@ -36,7 +36,6 @@
 
         {% for field in entity_viewable_fields %}
             <div class="form-group">
-
             {% if field != 'references' %}
 
                 {% if entity_fields_schema is not null and entity_fields_schema[field] is not null  %}
@@ -61,9 +60,10 @@
                         {{ field|replace({'.': ' ', '_': " "}) }}
                     {% endif %}
                 </label>
+
                 {% if entity.schema.multilanguage_fields is not null and field in entity.schema.multilanguage_fields %}
 
-                    {% for language in config.domain_structure.languages %}
+                    {% for language in config.backoffice.languages %}
                         <div style="margin-left: 20px">
                             <b>{{ language|upper }}</b><br>
                             {% include 'twig_partials/detail/form_element.twig' with {
@@ -77,6 +77,7 @@
                                                 'is_field_fillable': is_field_fillable,
                                                 'field': field,
                                                 'field_info': field_info,
+                                                'referenced_entities_contents': referenced_entities_contents,
                                                 'theme_style_sheet': theme_style_sheet,
                                                 'theme_blocks_json': theme_blocks_json
                                         }
@@ -87,7 +88,6 @@
                     {% endfor %}
 
                 {% else %}
-
                     {% include 'twig_partials/detail/form_element.twig' with {
                     'data': data,
                     'config': config,
@@ -97,7 +97,7 @@
                     'is_field_fillable': is_field_fillable,
                     'field': field,
                     'field_info': field_info,
-                    'editable_referenced_entities_contents': editable_referenced_entities_contents,
+                    'referenced_entities_contents': referenced_entities_contents,
                     'theme_style_sheet': theme_style_sheet,
                     'theme_blocks_json': theme_blocks_json
                     }

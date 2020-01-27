@@ -14,7 +14,7 @@ use Osds\Backoffice\UI\BaseUIController;
 class HomeController extends BaseUIController
 {
 
-    private $query_bus;
+    private $queryBus;
 
     public function __construct(
         Session $session

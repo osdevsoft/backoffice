@@ -12,7 +12,7 @@ use Osds\Backoffice\UI\BaseUIController;
 class ShowFormEntityController extends BaseUIController
 {
 
-    private $query_bus;
+    private $queryBus;
 
     public function __construct()
     {

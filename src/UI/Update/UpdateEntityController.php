@@ -2,11 +2,17 @@
 
 namespace Osds\Backoffice\UI\Update;
 
-use Osds\Backoffice\Application\Update\UpdateEntityCommand;
-use Osds\Backoffice\Application\Update\UpdateEntityCommandBus;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Osds\Backoffice\UI\BaseUIController;
+
+use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
+use Osds\DDDCommon\Infrastructure\View\ViewInterface;
+use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
+use Osds\Backoffice\Application\Update\UpdateEntityCommandBus;
+
+use Osds\Backoffice\Application\Update\UpdateEntityCommand;
+
+use function Osds\Backoffice\Utils\redirect;
 
 /**
  * @Route("/")
@@ -16,9 +22,16 @@ class UpdateEntityController extends BaseUIController
 
     private $commandBus;
 
-    public function __construct(UpdateEntityCommandBus $commandBus)
-    {
+    public function __construct(
+        SessionRepository $session,
+        ViewInterface $view,
+        LoadLocalizationApplication $loadLocalizationApplication,
+        UpdateEntityCommandBus $commandBus
+    ) {
         $this->commandBus = $commandBus;
+
+        parent::__construct($session, $view, $loadLocalizationApplication);
+
     }
     
     /**
@@ -26,37 +39,49 @@ class UpdateEntityController extends BaseUIController
      *
      * @Route(
      *     "/{entity}/edit/{uuid}",
-     *     methods={"PUT"}
+     *     methods={"POST"}
      * )
      *
      * @param null $entity
      * @return mixed
      */
-    public function update($entity)
+    public function update($entity, $uuid)
     {
 
         try
         {
+            $redirectUrl = str_replace('/edit/', '/', $_SERVER['PATH_INFO']);
             $this->build();
 
-            $this->preTreatBeforeSaving($model);
+            $requestParameters = $this->preTreatBeforeSaving($entity, $this->request->parameters['post']);
 
-            $this->request_data['uri'][] = $id;
-            $result = $this->performAction('update');
+            $messageObject = $this->getMessageObject($entity, $uuid, $requestParameters);
+            $result = $this->commandBus->dispatch($messageObject);
+            
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
-                return $this->redirect("/{$model}/edit/{$this->request_data['uri'][0]}", "success", "edit_ok");
+                return redirect($redirectUrl, "success", "edit_ok");
             } else {
-                return $this->redirect("/{$model}/edit/{$this->request_data['uri'][0]}", "danger", "edit_ko", $result['items'][0]['error_message']);
+                return redirect($redirectUrl, "danger", "edit_ko", $result['items'][0]['error_message']);
             }
         } catch(\Exception $e)
         {
-            return $this->redirect("/{$model}/edit/{$this->request_data['uri'][0]}", "danger", "edit_ko", $e);
+            return redirect($redirectUrl, "danger", "edit_ko", $e);
         }
-
 
         return true;
         
     }
-
+    
+    private function getMessageObject($entity, $uuid, $requestParameters)
+    {
+        
+        return new UpdateEntityCommand(
+            $entity,
+            $uuid,
+            $requestParameters
+        );
+        
+    }
+    
 }

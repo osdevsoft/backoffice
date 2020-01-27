@@ -2,6 +2,7 @@
 
 namespace Osds\Backoffice\Utils;
 
+use Osds\Backoffice\Infrastructure\Tools;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -23,7 +24,7 @@ function getAlertMessages($request_data)
 
 function redirect($url, $result = null, $message = null, $error = null)
 {
-    $locale = $this->loadLocalization($this->vendor_path . '/assets/localization/');
+    $locale = [];
 
     if ($message != null) {
         if (isset($locale[strtoupper($message)])) {
@@ -51,7 +52,8 @@ function redirect($url, $result = null, $message = null, $error = null)
 
 function loadSiteConfiguration()
 {
-    $path_file = __DIR__ . '/../../../../config/backoffice/domain_structure.yml';
+    $configuration_path = Tools::getPath('sites_configurations', 'samplesite_sandbox', true);
+    $path_file = $configuration_path . 'backoffice.yml';
     if (!is_file($path_file)) {
         return false;
     }
@@ -81,11 +83,11 @@ function folderSize($path)
     return $total_size;
 }
 
-function isMultilanguageField($field)
+function isMultilanguageField($field, $languages)
 {
     return
         is_array($field)
-        && array_keys($field) == $this->config['domain_structure']['languages']
+        && array_keys($field) == $languages
         ;
 }
 

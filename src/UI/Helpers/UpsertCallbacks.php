@@ -39,6 +39,8 @@ trait UpsertCallbacks {
 
     private function crypt($value)
     {
+        #already encripted
+        if(strstr($value, '$2y$10$')) return $value;
         return password_hash($value, PASSWORD_BCRYPT, ['cost' => 10]);
     }
 

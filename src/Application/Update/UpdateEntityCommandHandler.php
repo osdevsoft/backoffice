@@ -16,8 +16,8 @@ final class UpdateEntityCommandHandler implements CommandHandler
     public function handle(UpdateEntityCommand $command)
     {
         return $this->useCase->execute(
-            $query->entity(),
-            $query->requestParameters()
+            $command->entity(),
+            $command->requestParameters()
             );
     }
 }

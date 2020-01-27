@@ -2,13 +2,17 @@
 
 namespace Osds\Backoffice\UI\Search;
 
-use Osds\Backoffice\UI\Helpers\Session;
+use Symfony\Component\Routing\Annotation\Route;
+use Osds\Backoffice\UI\BaseUIController;
+
+use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
+use Osds\DDDCommon\Infrastructure\View\ViewInterface;
+use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
+use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
 use Osds\Backoffice\Application\Search\SearchEntityQuery;
-use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
-use Symfony\Component\Routing\Annotation\Route;
 
-use Osds\Backoffice\UI\BaseUIController;
+use function Osds\Backoffice\Utils\getAlertMessages;
 
 /**
  * @Route("/")
@@ -16,15 +20,19 @@ use Osds\Backoffice\UI\BaseUIController;
 class SearchEntityController extends BaseUIController
 {
 
-    private $query_bus;
+    private $queryBus;
 
     public function __construct(
-        SearchEntityQueryBus $query_bus,
-        Session $session
+        SessionRepository $session,
+        ViewInterface $view,
+        LoadLocalizationApplication $loadLocalizationApplication,
+        SearchEntityQueryBus $queryBus
     )
     {
-        $this->query_bus = $query_bus;
-        parent::__construct($session);
+        $this->queryBus = $queryBus;
+
+        parent::__construct($session, $view, $loadLocalizationApplication);
+
     }
 
     /**
@@ -41,46 +49,40 @@ class SearchEntityController extends BaseUIController
     public function search($entity)
     {
 
-        $message_object = $this->getEntityMessageObject($entity);
-        $data = $this->query_bus->ask($message_object);
+        $messageObject = $this->getEntityMessageObject($entity);
+        $data = $this->queryBus->ask($messageObject);
 
         $data = $this->preTreatDataBeforeDisplaying($entity, $data);
-        return $this->generateView($entity,'list', $data);
+
+        $this->setViewVariables($entity, $data);
+
+        $this->view->setTemplate('actions/list');
+
+        $this->view->render();
 
     }
 
     public function getEntityMessageObject($entity)
     {
         if (isset($this->config)
-            && isset($this->config['domain_structure'])
-            && isset($this->config['domain_structure']['entities'][$entity])
-            && isset($this->config['domain_structure']['entities'][$entity]['fields'])
-            && isset($this->config['domain_structure']['entities'][$entity]['fields']['in_list'])
+            && isset($this->config['backoffice'])
+            && isset($this->config['backoffice']['entities'][$entity])
+            && isset($this->config['backoffice']['entities'][$entity]['fields'])
+            && isset($this->config['backoffice']['entities'][$entity]['fields']['in_list'])
         ) {
            #we have referenced fields to display => we have to join them to recover them
-           foreach ($this->config['domain_structure']['entities'][$entity]['fields']['in_list'] as $listField) {
+           foreach ($this->config['backoffice']['entities'][$entity]['fields']['in_list'] as $listField) {
                if (strstr($listField, '.')) {
                   $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $listField);
                }
            }
            if (isset($gatherEntities)) {
-              $this->request->parameters->get['referenced_entities'] = implode(',', $gatherEntities);
+              $this->request->parameters['get']['referenced_entities'] = implode(',', $gatherEntities);
            }
         }
 
-        /*
-        if (isset($this->request->parameters->get['search_fields'])) {
-           $this->request->parameters->get['search_fields'] = $this->request->parameters->get['search_fields'];
-           unset($this->request->parameters->get['search_fields']);
-        }
-
-        if (isset($this->request->parameters->get['query_filters'])) {
-            $this->request->parameters->get['query_filters'] = $this->request->parameters->get['query_filters'];
-            unset($this->request->parameters->get['query_filters']);
-        }
-        */
         #pagination
-        $this->request->parameters->get['query_filters']['page_items'] = $this->config['domain_structure']['pagination']['items_per_page'];
+        $this->request->parameters['get']['query_filters']['page_items'] = $this->config['backoffice']['pagination']['items_per_page'];
 
 
         return new SearchEntityQuery(
@@ -88,6 +90,36 @@ class SearchEntityController extends BaseUIController
             $this->request->parameters
         );
 
+    }
+
+    /**
+     * @param $entity
+     * @param $data
+     */
+    public function setViewVariables($entity, $data): void
+    {
+        $this->view->setVariable('entity', $entity);
+        $this->view->setVariable('entities_list', $this->config['backoffice']['entities']);
+        $this->view->setVariable('action', 'list');
+
+        $this->view->setVariable('total_items', isset($data['total_items']) ? $data['total_items'] : null);
+        $this->view->setVariable('data', isset($data['items']) ? $data['items'] : null);
+        $this->view->setVariable('schema', isset($data['schema']) ? $data['schema'] : null);
+        $this->view->setVariable('required_entities_contents', isset($data['required_entities_contents']) ? $data['required_entities_contents'] : null);
+
+        $this->view->setVariable('GET', $this->request->parameters['get']);
+        $this->view->setVariable('alert_message', getAlertMessages($this->request));
+
+        if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
+            $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);
+            $this->view->setVariable('query_string_search_fields',
+                http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
+        }
+        $pagination_variables = $this->view->generatePagination(
+            $data['total_items'],
+            $this->config['backoffice']['pagination']);
+        $this->view->setVariable('paginator', $pagination_variables['paginator']);
+        $this->view->setVariable('items_per_page', $pagination_variables['items_per_page']);
     }
 
 }

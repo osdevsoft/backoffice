@@ -1,36 +1,39 @@
 services:
 
-    Session:
-        class: Osds\DDDCommon\Infrastructure\Persistence\SessionRepository
-        autowire: true
-
     Osds\Backoffice\UI\BaseUIController:
         autowire: true
         arguments:
             - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
         tags: ['controller.service_arguments']
 
+    ############
+    ### AUTH ###
+    ############
     Osds\Backoffice\UI\Login\ShowLoginFormController:
         autowire: true
         arguments:
             - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
         tags: ['controller.service_arguments']
     Osds\Backoffice\UI\Login\PostLoginFormController:
         autowire: true
-        tags: ['controller.service_arguments']
-
-
-    Osds\Backoffice\UI\HomeController:
-        autowire: true
         arguments:
             - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
         tags: ['controller.service_arguments']
 
     Osds\Backoffice\UI\Search\SearchEntityController:
         autowire: true
         arguments:
-            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
             - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
         tags: ['controller.service_arguments']
     Osds\Backoffice\Application\Search\SearchEntityQueryBus:
         autowire: true
@@ -38,10 +41,33 @@ services:
         autowire: true
     Osds\Backoffice\Application\Search\SearchEntityUseCase:
         autowire: true
+        arguments:
+            - "@OutputRequest"
+            - "@Session"
 
     Osds\Backoffice\UI\Search\FindEntityController:
         autowire: true
         arguments:
-            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
             - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
         tags: ['controller.service_arguments']
+
+    Osds\Backoffice\UI\Update\UpdateEntityController:
+        autowire: true
+        arguments:
+            - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Update\\UpdateEntityCommandBus"
+        tags: ['controller.service_arguments']
+    Osds\Backoffice\Application\Update\UpdateEntityCommandBus:
+        autowire: true
+    Osds\Backoffice\Application\Update\UpdateEntityCommandHandler:
+        autowire: true
+    Osds\Backoffice\Application\Update\UpdateEntityUseCase:
+        autowire: true
+        arguments:
+            - "@OutputRequest"
+            - "@Session"

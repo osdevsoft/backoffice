@@ -1,4 +1,0 @@
-services:
-
-  Illuminate\Http\Request:
-    autowire: true

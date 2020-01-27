@@ -1,0 +1,5 @@
+services:
+
+    LoadLocalizationApplication:
+      class: Osds\Backoffice\Application\Localization\LoadLocalizationApplication
+      autowire: true
