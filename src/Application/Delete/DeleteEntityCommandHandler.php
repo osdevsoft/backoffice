@@ -16,8 +16,8 @@ final class DeleteEntityCommandHandler implements CommandHandler
     public function handle(DeleteEntityCommand $command)
     {
         return $this->useCase->execute(
-            $query->entity(),
-            $query->requestParameters()
+            $command->entity(),
+            $command->requestParameters()
             );
     }
 }

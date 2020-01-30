@@ -7,7 +7,7 @@ use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 
 use Osds\Backoffice\UI\BaseUIController;
 
-final class UpdateEntityUseCase
+class UpdateEntityUseCase
 {
 
     private $outputRequest;
@@ -28,6 +28,12 @@ final class UpdateEntityUseCase
         $this->outputRequest->addAuthToken($this->session->find(BaseUIController::SERVICE_AUTH_COOKIE));
         $response = $this->outputRequest->sendRequest();
 
+        $entityCustomUseCase = 'Osds\Backoffice\Application\Update\StaticPage\UpdateStaticPageUseCase';
+        if(class_exists($entityCustomUseCase)) {
+            $entityCustomUseCase = new $entityCustomUseCase;
+            $entityCustomUseCase->execute($requestParameters);
+        }
+        
         return $response;
 
     }

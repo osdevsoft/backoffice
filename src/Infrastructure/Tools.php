@@ -12,7 +12,7 @@ class Tools
         return [
             'relativePaths' => [
                 'sites_configurations' => '/sites_configurations/%s/user/config/',
-                'backoffice_cache' => '/sites_configurations/%s/cache/backoffice/',
+                'backoffice_cache' => '/sites_configurations/%s/public/cache/backoffice/',
                 'public' => '/public/',
                 'localization' => '/vendor/osds/backoffice/assets/localization/',
                 'templates' => '../vendor/osds/backoffice/assets/theme/templates'

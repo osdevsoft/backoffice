@@ -7,15 +7,14 @@
 {% else %}
     {% set is_field_fillable = false %}
 {% endif %}
-
 {% if language is not null
     and data[field] is not null
-    and data[field] is iterable
 %}
     {# field has some value #}
     {# we already know it's multilanguage because we have "language" var set (from form.twig) #}
     {# maybe it's the first time in here (now we want multilang) so it could not be an array#}
-    {% set field_value = data[field][language] %}
+    {#{% set field_value = data[field][language] %}#}
+    {% set field_value = field|getLocalizedValue(entities_list[entity_name].schema.multilanguage_fields, data[field], language) %}
 {% endif %}
 
 {% if '.' in field %}

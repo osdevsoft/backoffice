@@ -7,7 +7,7 @@ use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 
 use Osds\Backoffice\UI\BaseUIController;
 
-final class InsertEntityUseCase
+class InsertEntityUseCase
 {
 
     public function __construct(

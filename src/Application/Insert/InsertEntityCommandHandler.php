@@ -16,8 +16,8 @@ final class InsertEntityCommandHandler implements CommandHandler
     public function handle(InsertEntityCommand $command)
     {
         return $this->useCase->execute(
-            $query->entity(),
-            $query->requestParameters()
+            $command->entity(),
+            $command->requestParameters()
             );
     }
 }

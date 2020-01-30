@@ -17,7 +17,7 @@ final class DeleteEntityCommand implements Command
     )
     {
         $this->entity = $entity;
-        $this->requestParameters = $request_parameters;
+        $this->requestParameters = $requestParameters;
     }
 
     public function entity(): string

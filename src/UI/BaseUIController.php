@@ -121,25 +121,6 @@ class BaseUIController
         return $loggedUser;
     }
 
-    /**
-     *
-     * Get all the contents of the referenced Entities (foreign-keyed models on DB)
-     *
-     * @return array
-     */
-    protected function getReferencedContents($schema_info = null, $model = null)
-    {
-        if($schema_info == null)
-        {
-            $schema_info_request = $this->performAction('getSchema');
-            $schema_info = $schema_info_request['items'][0]['fields'];
-        }
-
-        $referenced_contents = [];
-
-        return $referenced_contents;
-    }
-
     protected function preTreatBeforeSaving($entity, $requestParameters)
     {
         #treat field before saving it
@@ -200,40 +181,27 @@ class BaseUIController
         return $requestParameters;
     }
 
-    protected function preTreatDataBeforeDisplaying($entity, $data, $localize = false)
+    protected function getReferencedEntitiesToRequest($entity, $config)
     {
-
-        if (@count($data['items']) > 0) {
-
-            #treat multilanguage fields
-            if (isset($this->config['backoffice']['languages'])
-                && isset($this->config['backoffice']['entities'][$entity]['schema']['multilanguage_fields'])
-            ) {
-                foreach ($data['items'] as &$item) {
-                    foreach ($this->config['backoffice']['entities'][$entity]['schema']['multilanguage_fields'] as $ml_field) {
-                        $item[$ml_field] = json_decode($item[$ml_field], true);
-                        #preserve only a desired language
-                        if ($localize
-                            && is_array($item[$ml_field])
-                        ) {
-                            #check if we have at least one item of the array that is a valid language
-                            if (isset($this->visitor_language)
-                                && count(array_intersect(array_keys($item[$ml_field]), $this->config['backoffice']['languages'])) > 0
-                                && in_array($this->visitor_language, array_keys($item[$ml_field]))
-                            ) {
-                                #visitor language has a defined value on the field array
-                                $item[$ml_field] = $item[$ml_field][$this->visitor_language];
-                            } else {
-                                #user language is not defined, use first
-                                $item[$ml_field] = current($item[$ml_field]);
-                            }
-                        }
-                    }
+        $requestParameters = [];
+        if (isset($config)
+            && isset($config['backoffice'])
+            && isset($config['backoffice']['entities'][$entity])
+            && isset($config['backoffice']['entities'][$entity]['fields'])
+            && isset($config['backoffice']['entities'][$entity]['fields']['in_detail'])
+        ) {
+            #we have referenced fields to display => we have to join them to recover them
+            foreach ($config['backoffice']['entities'][$entity]['fields']['in_detail'] as $detailField) {
+                if (strstr($detailField, '.')) {
+                    $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $detailField);
                 }
             }
+            if (isset($gatherEntities)) {
+                $requestParameters['get']['referenced_entities'] = implode(',', $gatherEntities);
+                $requestParameters['get']['referenced_entities_contents'] = implode(',', $gatherEntities);
+            }
         }
-
-        return $data;
+        return $requestParameters;
     }
 
 }

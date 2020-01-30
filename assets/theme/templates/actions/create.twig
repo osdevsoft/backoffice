@@ -1,22 +1,47 @@
 {% extends 'layout.twig' %}
 
-{% if models_list[model]['schema']|length > 0 %}
-    {% set model_schema = models_list[model]['schema'] %}
+{% set form_action = '/' ~ entity ~ '/create' %}
+
+{% if entities_list[entity]['schema']|length > 0 %}
+    {% set entity_schema = entities_list[entity]['schema'] %}
 {% else %}
-    {% set model_schema = null %}
+    {% set entity_schema = null %}
 {% endif %}
 
-{% if model_schema is not null and model_schema.nice_name is not null %}
-    {% set model_nice_name = model_schema.nice_name %}
+{% if entity_schema is not null and entity_schema.nice_name is not null %}
+    {% set entity_nice_name = entity_schema.nice_name %}
 {% else %}
-    {% set model_nice_name = model %}
+    {% set entity_nice_name = entity %}
 {% endif %}
-
-{% set form_action = '/' ~ model ~ '/create' %}
 
 {% block contents %}
 
-    <h1>{{ model_nice_name }} :: {{ locale[action] }}</h1>
-    {% include 'twig_partials/detail/form.twig' with {'form_action': form_action, 'data': data[0], 'models': models_list, 'model_name': model } %}
+    <section class="content-header">
+        <h1>{{ entity_nice_name }} :: {{ locale[action] }}</h1>
+    </section>
+
+    <section class="content">
+        <div id="detail-actions">
+        {#
+            {% include views.detail_actions
+            with {
+                'data': data[0],
+                'entity_constants': entities_metadata[entity]
+            }
+        %}
+        #}
+        </div>
+
+
+        {% include 'twig_partials/detail/form.twig'
+            with {
+                'form_action': form_action,
+                'data': data[0],
+                'entities': entities_list,
+                'entity_name': entity,
+                'referenced_entities_contents': referenced_entities_contents
+            }
+        %}
+    </section>
 
 {% endblock %}

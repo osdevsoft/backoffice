@@ -45,6 +45,33 @@ services:
             - "@OutputRequest"
             - "@Session"
 
+    Osds\Backoffice\UI\Insert\ShowFormEntityController:
+        autowire: true
+        arguments:
+            - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
+        tags: ['controller.service_arguments']
+
+    Osds\Backoffice\UI\Insert\InsertEntityController:
+        autowire: true
+        arguments:
+            - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Insert\\InsertEntityCommandBus"
+        tags: ['controller.service_arguments']
+    Osds\Backoffice\Application\Insert\InsertEntityCommandBus:
+        autowire: true
+    Osds\Backoffice\Application\Insert\InsertEntityCommandHandler:
+        autowire: true
+    Osds\Backoffice\Application\Insert\InsertEntityUseCase:
+        autowire: true
+        arguments:
+            - "@OutputRequest"
+            - "@Session"
+
     Osds\Backoffice\UI\Search\FindEntityController:
         autowire: true
         arguments:
@@ -67,6 +94,25 @@ services:
     Osds\Backoffice\Application\Update\UpdateEntityCommandHandler:
         autowire: true
     Osds\Backoffice\Application\Update\UpdateEntityUseCase:
+        autowire: true
+        arguments:
+            - "@OutputRequest"
+            - "@Session"
+
+
+    Osds\Backoffice\UI\Delete\DeleteEntityController:
+        autowire: true
+        arguments:
+            - "@Session"
+            - "@SmartyView"
+            - "@LoadLocalizationApplication"
+            - "@Osds\\Backoffice\\Application\\Delete\\DeleteEntityCommandBus"
+        tags: ['controller.service_arguments']
+    Osds\Backoffice\Application\Delete\DeleteEntityCommandBus:
+        autowire: true
+    Osds\Backoffice\Application\Delete\DeleteEntityCommandHandler:
+        autowire: true
+    Osds\Backoffice\Application\Delete\DeleteEntityUseCase:
         autowire: true
         arguments:
             - "@OutputRequest"

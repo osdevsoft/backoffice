@@ -2,7 +2,7 @@
 
 namespace Osds\Backoffice\Application\Insert;
 
-use Osds\Backoffice\Domain\Bus\Query\Command;
+use Osds\Backoffice\Domain\Bus\Command\Command;
 
 final class InsertEntityCommand implements Command
 {
@@ -27,7 +27,9 @@ final class InsertEntityCommand implements Command
 
     public function requestParameters(): array
     {
-        return $this->requestParameters;
+        return [
+            'post' => $this->requestParameters
+            ];
     }
 
 }

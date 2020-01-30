@@ -127,14 +127,16 @@
                             {% endif %}
                         {% else %}
 
-                            {% if model_schema.multilanguage_fields is not null
-                            and field in model_schema.multilanguage_fields
-                            and item[field] is iterable
-                            %}
-                                {% set field_value = item[field][config.crm.language] %}
-                            {% else %}
-                                {% set field_value = item[field] %}
-                            {% endif %}
+                            {%  set field_value = field|getLocalizedValue(model_schema.multilanguage_fields, item[field], config.backoffice.language) %}
+
+                            {#{% if model_schema.multilanguage_fields is not null#}
+                            {#and field in model_schema.multilanguage_fields#}
+                            {#and item[field] is iterable#}
+                            {#%}#}
+                                {#{% set field_value = item[field][config.crm.language] %}#}
+                            {#{% else %}#}
+                                {#{% set field_value = item[field] %}#}
+                            {#{% endif %}#}
 
                             <td>
                                 {% if models_metadata[entity][field] is not null %}
@@ -170,7 +172,7 @@
                     {% endfor %}
                     <td class="actions">
                         <a href="/{{ model }}/{{ item.uuid }}">[{{ locale['View'] }}]</a>
-                        {#<a onclick="check_delete('{{ model }}', {{ item.id }})" href="#">[{{ locale['Delete'] }}]</a>#}
+                        <a onclick="check_delete('{{ model }}', '{{ item.uuid }}')" href="#">[{{ locale['Delete'] }}]</a>
                     </td>
                 </tr>
             {% endfor %}

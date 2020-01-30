@@ -21,45 +21,45 @@
     </section>
 
     <section class="content">
-    <div id="detail-actions">
-    {#
-        {% include views.detail_actions
-        with {
-            'data': data[0],
-            'entity_constants': entities_metadata[entity]
-        }
-    %}
-    #}
-    </div>
-
-
-    {% include 'twig_partials/detail/form.twig'
+        <div id="detail-actions">
+        {#
+            {% include views.detail_actions
             with {
-                    'form_action': form_action,
-                    'data': data[0],
-                    'entities': entities_list,
-                    'entity_name': entity,
-                    'referenced_entities_contents': referenced_entities_contents
+                'data': data[0],
+                'entity_constants': entities_metadata[entity]
             }
-    %}
+        %}
+        #}
+        </div>
 
-    {% if entities_list[entity]['related_entities']|length > 0 %}
-        <section id="referenced-entities">
-            <hr>
-            <h3>Referenced Data</h3>
-            {% include 'twig_partials/detail/referenced_entities.twig' with {
-                'relations_data': data[0]['relations'],
+
+        {% include 'twig_partials/detail/form.twig'
+            with {
+                'form_action': form_action,
+                'data': data[0],
                 'entities': entities_list,
-                'related_entities': entities_list[entity]['related_entities'],
-                'schema': schema,
-                'parent_entity': entity,
-                'parent_id': data[0].id
-                }
-            %}
-        </section>
-    {% endif %}
+                'entity_name': entity,
+                'referenced_entities_contents': referenced_entities_contents
+            }
+        %}
 
-    <div style="height:50px"></div>
+        {% if entities_list[entity]['related_entities']|length > 0 %}
+            <section id="referenced-entities">
+                <hr>
+                <h3>Referenced Data</h3>
+                {% include 'twig_partials/detail/referenced_entities.twig' with {
+                    'relations_data': data[0]['relations'],
+                    'entities': entities_list,
+                    'related_entities': entities_list[entity]['related_entities'],
+                    'schema': schema,
+                    'parent_entity': entity,
+                    'parent_id': data[0].id
+                    }
+                %}
+            </section>
+        {% endif %}
+
+        <div style="height:50px"></div>
     </section>
 
 <script>

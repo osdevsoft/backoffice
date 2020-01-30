@@ -21,7 +21,7 @@
             {% endif %}
             <a href="{{ page_link }}" class="{{ class }}">
             {% if paginator.mode == 'results' %}
-                {{ max( (page_num - 1)  * items_per_page, 1) }}-{{ page_num  * items_per_page}}
+                {{ max( (page_num - 1)  * items_per_page, 1) }}-{{ min(page_num  * items_per_page, total_items)}}
             {% else %}
                 {{ page_num }}
             {% endif %}

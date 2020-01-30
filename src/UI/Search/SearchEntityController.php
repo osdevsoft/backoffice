@@ -52,7 +52,7 @@ class SearchEntityController extends BaseUIController
         $messageObject = $this->getEntityMessageObject($entity);
         $data = $this->queryBus->ask($messageObject);
 
-        $data = $this->preTreatDataBeforeDisplaying($entity, $data);
+//        $data = $this->preTreatDataBeforeDisplaying($entity, $data);
 
         $this->setViewVariables($entity, $data);
 

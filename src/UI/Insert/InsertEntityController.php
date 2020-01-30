@@ -2,11 +2,17 @@
 
 namespace Osds\Backoffice\UI\Insert;
 
-use Osds\Backoffice\Application\Insert\InsertEntityCommand;
-use Osds\Backoffice\Application\Insert\InsertEntityCommandBus;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Osds\Backoffice\UI\BaseUIController;
+
+use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
+use Osds\DDDCommon\Infrastructure\View\ViewInterface;
+use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
+use Osds\Backoffice\Application\Insert\InsertEntityCommandBus;
+
+use Osds\Backoffice\Application\Insert\InsertEntityCommand;
+
+use function Osds\Backoffice\Utils\redirect;
 
 /**
  * @Route("/")
@@ -16,9 +22,17 @@ class InsertEntityController extends BaseUIController
 
     private $commandBus;
 
-    public function __construct(InsertEntityCommandBus $commandBus)
+    public function __construct(
+        SessionRepository $session,
+        ViewInterface $view,
+        LoadLocalizationApplication $loadLocalizationApplication,
+        InsertEntityCommandBus $commandBus
+    )
     {
         $this->commandBus = $commandBus;
+
+        parent::__construct($session, $view, $loadLocalizationApplication);
+
     }
     
     /**
@@ -37,24 +51,35 @@ class InsertEntityController extends BaseUIController
 
         try
         {
+            $redirectUrl = str_replace('/create', '/', $_SERVER['PATH_INFO']);
             $this->build();
 
-            $this->preTreatBeforeSaving($entity);
+            $requestParameters = $this->preTreatBeforeSaving($entity, $this->request->parameters['post']);
+            $messageObject = $this->getEntityMessageObject($entity, $requestParameters);
+            $result = $this->commandBus->dispatch($messageObject);
 
-            $result = $this->performAction('create');
+            #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
-                return $this->redirect("/{$model}/edit/{$result['items'][0]['upsert_id']}", "success", "create_ok");
+                return redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "create_ok");
             } else {
-                return $this->redirect("/{$model}", "warning", $result['error_message']);
+                return redirect($redirectUrl, "danger", "create_ko", $result['items'][0]['error_message']);
             }
 
         } catch(\Exception $e)
         {
-            $this->redirect("/{$model}", "danger", "create_ko", $e);
+            return redirect($redirectUrl, "danger", "create_ko", $e);
         }
 
         return true;
         
+    }
+    
+    private function getEntityMessageObject($entity, $requestParameters)
+    {
+        return new InsertEntityCommand(
+            $entity,
+            $requestParameters
+        );
     }
 
 }

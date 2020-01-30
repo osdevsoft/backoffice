@@ -50,30 +50,13 @@ class FindEntityController extends BaseUIController
     public function find($entity, $uuid)
     {
 
-        if (isset($this->config)
-            && isset($this->config['backoffice'])
-            && isset($this->config['backoffice']['entities'][$entity])
-            && isset($this->config['backoffice']['entities'][$entity]['fields'])
-            && isset($this->config['backoffice']['entities'][$entity]['fields']['in_detail'])
-        ) {
-            #we have referenced fields to display => we have to join them to recover them
-                foreach ($this->config['backoffice']['entities'][$entity]['fields']['in_detail'] as $detailField) {
-                if (strstr($detailField, '.')) {
-                    $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $detailField);
-                }
-            }
-            if (isset($gatherEntities)) {
-                $this->request->parameters['get']['referenced_entities'] = implode(',', $gatherEntities);
-                $this->request->parameters['get']['referenced_entities_contents'] = implode(',', $gatherEntities);
-            }
-        }
-
+        $referencedEntitiesRequest = $this->getReferencedEntitiesToRequest($entity, $this->config);
+        $this->request->parameters = array_merge($this->request->parameters, $referencedEntitiesRequest);
+        
         $this->request->parameters['get']['search_fields']['uuid'] = $uuid;
 
         $message_object = $this->getEntityMessageObject($entity, $this->request);
         $data = $this->queryBus->ask($message_object);
-
-        $data = $this->preTreatDataBeforeDisplaying($entity, $data);
 
         $this->setViewVariables($entity, $data);
 
@@ -118,11 +101,6 @@ class FindEntityController extends BaseUIController
             $this->view->setVariable('query_string_search_fields',
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
         }
-
-//        $pagination_variables = $this->view->generatePagination($data['total_items'],
-//            $this->config['backoffice']['pagination']);
-//        $this->view->setVariable('paginator', $pagination_variables['paginator']);
-//        $this->view->setVariable('items_per_page', $pagination_variables['items_per_page']);
 
         $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
     }
