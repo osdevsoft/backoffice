@@ -14,26 +14,29 @@
     "guzzlehttp/guzzle": "6.3.*",
     "symfony/yaml": "4.2.*",
     "doctrine/annotations": "1.6.*",
-    "osds/template-blocks": "dev-master",
-    "osds/ddd-common": "dev-master"
+    "osds/ddd-common": "dev-master",
+    "osds/auth": "dev-master",
+    "osds/template-blocks": "dev-master"
   },
 
   "repositories": {
-    "template-blocks": {
-      "type": "vcs",
-      "url": "https://github.com/osdevsoft/template-blocks"
-    },
     "osds-ddd-common": {
       "type": "vcs",
       "url": "https://github.com/osdevsoft/ddd-common"
+    },
+    "osds-auth": {
+      "type": "vcs",
+      "url": "https://github.com/osdevsoft/auth"
+    },
+    "template-blocks": {
+      "type": "vcs",
+      "url": "https://github.com/osdevsoft/template-blocks"
     }
   },
 
   "autoload": {
     "psr-4": {
-      "Osds\\Backoffice\\": [
-        "src/"
-      ]
+      "Osds\\Backoffice\\": "src/"
     },
     "files": [
       "src/utils.php"
