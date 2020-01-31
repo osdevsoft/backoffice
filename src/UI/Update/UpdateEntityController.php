@@ -12,7 +12,7 @@ use Osds\Backoffice\Application\Update\UpdateEntityCommandBus;
 
 use Osds\Backoffice\Application\Update\UpdateEntityCommand;
 
-use function Osds\Backoffice\Utils\redirect;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -60,13 +60,13 @@ class UpdateEntityController extends BaseUIController
             
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
-                return redirect($redirectUrl, "success", "edit_ok");
+                UI::redirect($redirectUrl, "success", "edit_ok");
             } else {
-                return redirect($redirectUrl, "danger", "edit_ko", $result['items'][0]['error_message']);
+                UI::redirect($redirectUrl, "danger", "edit_ko", $result['items'][0]['error_message']);
             }
         } catch(\Exception $e)
         {
-            return redirect($redirectUrl, "danger", "edit_ko", $e);
+            UI::redirect($redirectUrl, "danger", "edit_ko", $e);
         }
 
         return true;

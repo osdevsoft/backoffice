@@ -58,99 +58,14 @@ class Tools
     }
 
 
-    public static function checkSeoName($value)
+    public static function loadSiteConfiguration()
     {
-        $from = array(
-            'á','À','Á','Â','Ã','Ä','Å',
-            'ß','Ç',
-            'é','è','ë','È','É','Ê','Ë',
-            'í','ì','ï','Ì','Í','Î','Ï','Ñ',
-            'ó','ò','ö','Ò','Ó','Ô','Õ','Ö',
-            'ú','ù','ü','Ù','Ú','Û','Ü');
-
-        $to = array(
-            'a','A','A','A','A','A','A',
-            'B','C',
-            'e','e','e','E','E','E','E',
-            'i','i','i','I','I','I','I','N',
-            'o','o','o','O','O','O','O','O',
-            'u','u','u','U','U','U','U');
-
-        $value = str_replace($from, $to, $value);
-        $value = str_replace(' ', '-', $value);
-        $value = strtolower($value);
-        $words = preg_split("#[^a-z0-9]#", $value, -1, PREG_SPLIT_NO_EMPTY);
-        return implode("-", $words);
-    }
-
-
-    public function getAlertMessages($requestParameters)
-    {
-        $message = null;
-
-        if(isset($requestParameters['action_message']))
-        {
-            $message = ['message' => $requestParameters['action_message'] ];
-            if(isset($requestParameters['action_result']))
-            {
-                $message['type'] = $requestParameters['action_result'];
-            } else {
-                $message['type'] = 'info';
-            }
+        $configuration_path = self::getPath('sites_configurations', 'samplesite_sandbox', true);
+        $path_file = $configuration_path . 'backoffice.yml';
+        if (!is_file($path_file)) {
+            return false;
         }
-
-        return $message;
-    }
-
-    public function redirect($url, $result = null, $message = null, $error = null)
-    {
-        $locale = $this->loadLocalization($this->vendor_path . 'Localization/');
-
-        $url = '/' . BACKOFFICE_FOLDER . $url;
-        if($message != null)
-        {
-            if(isset($locale[strtoupper($message)]))
-            {
-                $message = $locale[strtoupper($message)];
-            }
-            $url .= '?action_message=' . $message;
-
-            if($error != null) {
-                if(is_string($error)) {
-                    $url .= $error;
-                } else {
-                    $url .= $error->getMessage() . ' @ ' . basename($error->getFile()) . '::' . $error->getLine();
-                }
-            }
-
-            if($result != null)
-            {
-                $url .= '&action_result=' . $result;
-            }
-        }
-        header('Location: ' . $url);
-        exit;
-    }
-
-
-    public function folderSize($path) {
-        $total_size = 0;
-        $files = scandir($path);
-        $cleanPath = rtrim($path, '/') . '/';
-
-        foreach ($files as $t) {
-            if ($t <> "." && $t <> "..") {
-                $currentFile = $cleanPath . $t;
-                if (is_dir($currentFile)) {
-                    $size = $this->foldersize($currentFile);
-                    $total_size += $size;
-                } else {
-                    $size = filesize($currentFile);
-                    $total_size += $size;
-                }
-            }
-        }
-        return $total_size;
+        return Yaml::parse(file_get_contents($path_file));
     }
 
     public static function getTemplateJSForTinyMce()

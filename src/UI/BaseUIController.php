@@ -2,6 +2,7 @@
 
 namespace Osds\Backoffice\UI;
 
+
 use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
@@ -10,9 +11,10 @@ use Osds\Backoffice\UI\Helpers\UpsertCallbacks;
 
 use Symfony\Component\Routing\Annotation\Route;
 
-use function Osds\Backoffice\Utils\loadSiteConfiguration;
-use function Osds\Backoffice\Utils\isMultilanguageField;
+use Osds\DDDCommon\Infrastructure\Helpers\Language;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
+use Osds\Backoffice\Infrastructure\Tools;
 
 class BaseUIController
 {
@@ -62,15 +64,16 @@ class BaseUIController
 
             $this->view->setVariable('locale', $this->loadLocalizationApplication->execute());
 
+            $userData = null;
             #Auth BO - API
             self::checkServiceAuth($this->session);
 
             if (#is not in Backoffice login page
-                !strstr($_SERVER['REQUEST_URI'], 'login')
+                !strstr($_SERVER['REQUEST_URI'], 'login') &&
                 #user auth
-                && ($userData = self::checkUserAuth($this->session)) == false
+                ($userData = self::checkUserAuth($this->session)) == false
             ) {
-                $this->redirect(self::PAGES['session']['login']);
+                UI::redirect(self::PAGES['session']['login']);
             }
             $this->view->setVariable('loggedUser', $userData);
 
@@ -95,7 +98,7 @@ class BaseUIController
             $this->request->files = $_FILES;
         }
 
-        $this->config['backoffice'] = loadSiteConfiguration();
+        $this->config['backoffice'] = Tools::loadSiteConfiguration();
         $this->entities = $this->config['backoffice']['entities'];
     }
     
@@ -134,7 +137,7 @@ class BaseUIController
                     $field_value = $requestParameters[$field];
                     foreach($field_schema['callbacks'] as $callback)
                     {
-                        if(isMultilanguageField($field_value, $this->config['backoffice']['languages']))
+                        if(Language::isMultilanguageField($field_value, $this->config['backoffice']['languages']))
                         {
                             foreach($field_value as $lang => $value)
                             {
@@ -165,7 +168,7 @@ class BaseUIController
         {
             foreach($requestParameters as $field => $value)
             {
-                if(isMultilanguageField($value, $this->config['backoffice']['languages']))
+                if(Language::isMultilanguageField($value, $this->config['backoffice']['languages']))
                 {
                     $requestParameters[$field] = json_encode($value);
                 }

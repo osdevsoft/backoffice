@@ -16,7 +16,7 @@ class UpdateStaticPageUseCase
                 ExportToHTMLService::execute(getDomainData(), $language_page, $language);
             }
         } else {
-            ExportToHTMLService::execute(get_server_id(), $data['post']['seo_name']);
+            ExportToHTMLService::execute(getDomainData(), $data['post']['seo_name']);
         }
 
         return $data;

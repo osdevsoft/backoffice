@@ -12,7 +12,7 @@ use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
 use Osds\Backoffice\Application\Search\SearchEntityQuery;
 
-use function Osds\Backoffice\Utils\redirect;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -48,7 +48,8 @@ class PostLoginFormController extends BaseUIController
 
         $this->build();
 
-        $message_object = $this->getEntityMessageObject('user', $this->request);
+        $searchData = ['get' => ['search_fields[email]' => $this->request->parameters['post']['email']]];
+        $message_object = $this->getEntityMessageObject('user', $searchData);
 
         $data = $this->query_bus->ask($message_object);
 
@@ -57,9 +58,9 @@ class PostLoginFormController extends BaseUIController
             && password_verify($this->request->parameters['post']['password'], $data['items'][0]['password'])
         ) {
             $this->session->insert(self::USER_AUTH_COOKIE, $data['items'][0]);
-            redirect('/user');
+            UI::redirect('/user');
         } else {
-            redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
+            UI::redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
         }
 
     }
@@ -68,7 +69,7 @@ class PostLoginFormController extends BaseUIController
     {
         return new SearchEntityQuery(
             $entity,
-            $request->parameters
+            $request
         );
 
     }

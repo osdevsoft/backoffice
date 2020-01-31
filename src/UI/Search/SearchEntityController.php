@@ -12,7 +12,7 @@ use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
 use Osds\Backoffice\Application\Search\SearchEntityQuery;
 
-use function Osds\Backoffice\Utils\getAlertMessages;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -51,8 +51,6 @@ class SearchEntityController extends BaseUIController
 
         $messageObject = $this->getEntityMessageObject($entity);
         $data = $this->queryBus->ask($messageObject);
-
-//        $data = $this->preTreatDataBeforeDisplaying($entity, $data);
 
         $this->setViewVariables($entity, $data);
 
@@ -108,7 +106,7 @@ class SearchEntityController extends BaseUIController
         $this->view->setVariable('required_entities_contents', isset($data['required_entities_contents']) ? $data['required_entities_contents'] : null);
 
         $this->view->setVariable('GET', $this->request->parameters['get']);
-        $this->view->setVariable('alert_message', getAlertMessages($this->request));
+        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request));
 
         if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);

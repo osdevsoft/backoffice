@@ -12,7 +12,7 @@ use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
 use Osds\Backoffice\Application\Search\SearchEntityQuery;
 use Osds\Backoffice\Infrastructure\Tools;
-use function Osds\Backoffice\Utils\getAlertMessages;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -88,7 +88,7 @@ class ShowFormEntityController extends BaseUIController
         $this->view->setVariable('action', 'detail');
 
         $this->view->setVariable('GET', $this->request->parameters['get']);
-        $this->view->setVariable('alert_message', getAlertMessages($this->request));
+        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request));
 
         if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);

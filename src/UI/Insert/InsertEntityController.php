@@ -12,7 +12,7 @@ use Osds\Backoffice\Application\Insert\InsertEntityCommandBus;
 
 use Osds\Backoffice\Application\Insert\InsertEntityCommand;
 
-use function Osds\Backoffice\Utils\redirect;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -60,14 +60,14 @@ class InsertEntityController extends BaseUIController
 
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
-                return redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "create_ok");
+                UI::redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "create_ok");
             } else {
-                return redirect($redirectUrl, "danger", "create_ko", $result['items'][0]['error_message']);
+                UI::redirect($redirectUrl, "danger", "create_ko", $result['items'][0]['error_message']);
             }
 
         } catch(\Exception $e)
         {
-            return redirect($redirectUrl, "danger", "create_ko", $e);
+            UI::redirect($redirectUrl, "danger", "create_ko", $e);
         }
 
         return true;

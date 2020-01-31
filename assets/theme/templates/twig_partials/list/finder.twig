@@ -22,7 +22,6 @@
                         {% else %}
                             {% set model_metadata_values = entity_metadata[model_name][field] %}
                         {% endif %}
-
                         {# field has been searched previously. Get its searched value #}
                         {% if search_fields[field] is iterable %}
                             {% set field_searched_value = search_fields[field].value %}

@@ -2,7 +2,6 @@
 
 namespace Osds\Backoffice\UI\Search;
 
-use Osds\Backoffice\Infrastructure\Tools;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
@@ -13,7 +12,8 @@ use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
 use Osds\Backoffice\Application\Search\SearchEntityQuery;
 
-use function Osds\Backoffice\Utils\getAlertMessages;
+use Osds\Backoffice\Infrastructure\Tools;
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
 /**
  * @Route("/")
@@ -94,7 +94,7 @@ class FindEntityController extends BaseUIController
         $this->view->setVariable('referenced_entities_contents', isset($data['referenced_entities_contents']) ? $data['referenced_entities_contents'] : null);
 
         $this->view->setVariable('GET', $this->request->parameters['get']);
-        $this->view->setVariable('alert_message', getAlertMessages($this->request));
+        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request));
 
         if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);

@@ -2,7 +2,6 @@
 
 namespace Osds\Backoffice\UI\Delete;
 
-use function Osds\Backoffice\Utils\redirect;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
@@ -11,6 +10,7 @@ use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
 use Osds\Backoffice\Application\Delete\DeleteEntityCommandBus;
 
+use Osds\DDDCommon\Infrastructure\Helpers\UI;
 use Osds\Backoffice\Application\Delete\DeleteEntityCommand;
 
 /**
@@ -58,17 +58,15 @@ class DeleteEntityController extends BaseUIController
             $messageObject = $this->getEntityMessageObject($entity, $requestParameters);
             $result = $this->commandBus->dispatch($messageObject);
 
-            ### move to UC
-            $this->request_data['uri'][] = $id;
             #redirect to detail
             if (isset($result['items'][0]['deleted_id'])) {
-                return redirect($redirectUrl, "success", "delete_ok");
+                UI::redirect($redirectUrl, "success", "delete_ok");
             } else {
-                return redirect($redirectUrl, "danger", "delete_ko", $result['items'][0]['error_message']);
+                UI::redirect($redirectUrl, "danger", "delete_ko", $result['items'][0]['error_message']);
             }
         } catch(\Exception $e)
         {
-            return redirect($redirectUrl, "danger", "delete_ko", $e);
+            UI::redirect($redirectUrl, "danger", "delete_ko", $e);
         }
 
         return true;
