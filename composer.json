@@ -8,7 +8,7 @@
     }
   ],
   "minimum-stability": "dev",
-  "version": "1.0a",
+  "version": "0.1",
   "require": {
     "phpunit/phpunit": "^7.0",
     "guzzlehttp/guzzle": "6.3.*",
