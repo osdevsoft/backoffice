@@ -2,7 +2,7 @@
 
 namespace Osds\Backoffice\Application\Localization;
 
-use Osds\Backoffice\Infrastructure\Tools;
+use Osds\Backoffice\Infrastructure\Helpers\Path;
 
 class LoadLocalizationApplication
 {
@@ -10,7 +10,7 @@ class LoadLocalizationApplication
     public function execute()
     {
 
-        $localizationPath = Tools::getPath('localization', null, true);
+        $localizationPath = Path::getPath('localization', null, true);
 
         $literalsFile = $localizationPath . 'es-es.php';
 
