@@ -16,3 +16,5 @@ services:
     public: true
     arguments:
       - "%env(API_URL)%"
+      - "%env(API_AUTH_USERNAME)%"
+      - "%env(API_AUTH_PASSWORD)%"

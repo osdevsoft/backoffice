@@ -2,6 +2,7 @@
 
 namespace Osds\Backoffice\UI\Login;
 
+use Osds\Auth\Infrastructure\UI\StaticClass\Auth;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
@@ -48,16 +49,15 @@ class PostLoginFormController extends BaseUIController
 
         $this->build();
 
-        $searchData = ['get' => ['search_fields[email]' => $this->request->parameters['post']['email']]];
-        $message_object = $this->getEntityMessageObject('user', $searchData);
+        $requestParameters = $this->request->parameters['post'];
+        $authUser = Auth::getUserAuthToken(
+            'http://api.osdshub.sandbox/api/',
+            $requestParameters['email'],
+            $requestParameters['password'],
+            'backoffice'
+        );
 
-        $data = $this->query_bus->ask($message_object);
-
-        if (isset($data)
-            && $data['total_items'] == 1
-            && password_verify($this->request->parameters['post']['password'], $data['items'][0]['password'])
-        ) {
-            $this->session->insert(self::USER_AUTH_COOKIE, $data['items'][0]);
+        if ($authUser != null) {
             UI::redirect('/user');
         } else {
             UI::redirect(self::PAGES['session']['login'], 'danger', 'login_ko');

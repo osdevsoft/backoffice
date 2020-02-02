@@ -3,6 +3,7 @@
 namespace Osds\Backoffice\UI;
 
 
+use Osds\Auth\Infrastructure\UI\StaticClass\Auth;
 use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
@@ -21,9 +22,6 @@ class BaseUIController
 
     use UpsertCallbacks;
             
-    const USER_AUTH_COOKIE = 'bo_user_auth';
-    const SERVICE_AUTH_COOKIE = 'bo_service_auth';
-    
     const PAGES = [
         'session' => [
             'login' => '/session/login',
@@ -65,13 +63,11 @@ class BaseUIController
             $this->view->setVariable('locale', $this->loadLocalizationApplication->execute());
 
             $userData = null;
-            #Auth BO - API
-            self::checkServiceAuth($this->session);
 
             if (#is not in Backoffice login page
                 !strstr($_SERVER['REQUEST_URI'], 'login') &&
                 #user auth
-                ($userData = self::checkUserAuth($this->session)) == false
+                ($userData = self::checkUserAuth()) == null
             ) {
                 UI::redirect(self::PAGES['session']['login']);
             }
@@ -102,26 +98,9 @@ class BaseUIController
         $this->entities = $this->config['backoffice']['entities'];
     }
     
-    public static function checkServiceAuth($session)
+    public static function checkUserAuth()
     {
-        
-        $serviceToken = $session->find(self::SERVICE_AUTH_COOKIE);
-
-        if ($serviceToken == null) {
-            #TODO: request API for a token
-            $serviceToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1ODAwMzQyODUsImV4cCI6MTU4MDYzOTA4NSwicm9sZXMiOlsiQWRtaW4iLCJBUEkiXSwidXNlcm5hbWUiOiJ4YXZpY3gifQ.rlJAbNsNp1r9WVLnqbEuyzMG8esZBjI36E7CQSRea6WofVddLSUEgKz4lO5r79J22oM4kztzbxiNEefD7dvNhivmiACW881qihbn1aP9kWTRSSEZL1Ii3bDHNSgO4t5xd_Olp-GmmFH2zUxgc1sRFrDStTgYnCNLx1-aYKtvOUruS1f2yq3M2F4Jzaddur_fJ_M-YuBbhAQecJwzALh1pnyI3_HOwwFHGbraRJK6afQVnfqoNv9HmHSB-kb78z9XZ7uiAkLG0v1UbnRLlnFiGk2dSXaGrjVtHSnvWq6IuLqyZK-GfR80nvK2HAnPka0b1vKOCBVle5vpMc9wIuPG1knTTeeSoqy3U725TFLCI30Ys6aMEzDTxzKE7lHmXsLzVRuj8AyrW6CXrnIM42CNaY3jqR7dkUI_MQge7A84oqvLI7QjFrLlNPz3B8pb3nr-6nKuS3gpEkDvjTODbvTvyIfPX7ETmTjYS1Vlo9DsOtDz_kE8khaFuKgO-U1NZoNhamEREWG9ExxxbhAOL1fclMDGEbos8xpH9QqN0kfY6RGwPWmzdsyvfdhQxEoXLIJszMASPopMnk_0Z5qvxZNMMvlKfyS8qu43TuiwxPIahBbQBaKp0rMVHXxxzera7t2Ci89jh6qNgWgGBkjL1CYni2KkwEVoAeEqqX1NLEooRcE";
-            $session->insert(self::SERVICE_AUTH_COOKIE, $serviceToken);
-        }
-    }
-
-    public static function checkUserAuth($session)
-    {
-        $loggedUser = $session->find(self::USER_AUTH_COOKIE);
-        if ($loggedUser == null) {
-            return false;
-        }
-
-        return $loggedUser;
+        return Auth::getUserAuthToken();
     }
 
     protected function preTreatBeforeSaving($entity, $requestParameters)

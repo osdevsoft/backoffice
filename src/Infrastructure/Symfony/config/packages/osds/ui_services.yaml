@@ -43,7 +43,6 @@ services:
         autowire: true
         arguments:
             - "@OutputRequest"
-            - "@Session"
 
     Osds\Backoffice\UI\Insert\ShowFormEntityController:
         autowire: true
@@ -70,7 +69,6 @@ services:
         autowire: true
         arguments:
             - "@OutputRequest"
-            - "@Session"
 
     Osds\Backoffice\UI\Search\FindEntityController:
         autowire: true
@@ -97,7 +95,6 @@ services:
         autowire: true
         arguments:
             - "@OutputRequest"
-            - "@Session"
 
 
     Osds\Backoffice\UI\Delete\DeleteEntityController:
@@ -116,4 +113,3 @@ services:
         autowire: true
         arguments:
             - "@OutputRequest"
-            - "@Session"

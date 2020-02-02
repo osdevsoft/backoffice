@@ -3,12 +3,6 @@ services:
   Illuminate\Http\Request:
     autowire: true
 
-  OutputRequest:
-    class: Osds\DDDCommon\Infrastructure\Communication\OutputRequest
-    public: true
-    arguments:
-      - "%env(API_URL)%"
-
 twig:
   debug: true #'%kernel.debug%'
   default_path: '%kernel.project_dir%/vendor/osds/backoffice/assets/theme/templates'
