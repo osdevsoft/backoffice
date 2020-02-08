@@ -127,16 +127,13 @@
                             {% endif %}
                         {% else %}
 
-                            {%  set field_value = field|getLocalizedValue(model_schema.multilanguage_fields, item[field], config.backoffice.language) %}
-
-                            {#{% if model_schema.multilanguage_fields is not null#}
-                            {#and field in model_schema.multilanguage_fields#}
-                            {#and item[field] is iterable#}
-                            {#%}#}
-                                {#{% set field_value = item[field][config.crm.language] %}#}
-                            {#{% else %}#}
-                                {#{% set field_value = item[field] %}#}
-                            {#{% endif %}#}
+                            {% if model_schema.multilanguage_fields is not null
+                            and field in model_schema.multilanguage_fields
+                            and item[field] is iterable %}
+                                {%  set field_value = field|getLocalizedValue(model_schema.multilanguage_fields, item[field], config.backoffice.language) %}
+                            {% else %}
+                                {% set field_value = item[field] %}
+                            {% endif %}
 
                             <td>
                                 {% if models_metadata[entity][field] is not null %}

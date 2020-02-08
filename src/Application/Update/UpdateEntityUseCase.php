@@ -20,15 +20,17 @@ class UpdateEntityUseCase
     {
 
         $this->outputRequest->setQuery($entity,'post', $requestParameters);
-        $response = $this->outputRequest->sendRequest();
+        $response = $this->outputRequest->sendRequest('backoffice');
 
         #TODO: make generic
-        $entityCustomUseCase = 'Osds\Backoffice\Application\Update\StaticPage\UpdateStaticPageUseCase';
-        if(class_exists($entityCustomUseCase)) {
-            $entityCustomUseCase = new $entityCustomUseCase;
-            $entityCustomUseCase->execute($requestParameters);
+        if($entity == 'static_page') {
+            $entityCustomUseCase = 'Osds\Backoffice\Application\Update\StaticPage\UpdateStaticPageUseCase';
+            if(class_exists($entityCustomUseCase)) {
+                $entityCustomUseCase = new $entityCustomUseCase;
+                $entityCustomUseCase->execute($requestParameters);
+            }
         }
-        
+
         return $response;
 
     }

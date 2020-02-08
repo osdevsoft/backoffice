@@ -3,7 +3,9 @@
 namespace Osds\Backoffice\UI;
 
 
+use Osds\Auth\Infrastructure\UI\ServiceAuth;
 use Osds\Auth\Infrastructure\UI\StaticClass\Auth;
+use Osds\Auth\Infrastructure\UI\UserAuth;
 use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
@@ -37,14 +39,6 @@ class BaseUIController
 
     public $config;
 
-    public $models;
-
-
-    public $vendor_path = __DIR__ . '/../';
-
-    public $commands_path = '\Osds\Backoffice\Application\Commands\%action%%model%Command';
-
-
     public function __construct(
         SessionRepository $session,
         ViewInterface $view,
@@ -67,7 +61,7 @@ class BaseUIController
             if (#is not in Backoffice login page
                 !strstr($_SERVER['REQUEST_URI'], 'login') &&
                 #user auth
-                ($userData = self::checkUserAuth()) == null
+                ($userData = UserAuth::checkUserAuth($this->session, 'backoffice')) == null
             ) {
                 UI::redirect(self::PAGES['session']['login']);
             }
@@ -98,11 +92,6 @@ class BaseUIController
         $this->entities = $this->config['backoffice']['entities'];
     }
     
-    public static function checkUserAuth()
-    {
-        return Auth::getUserAuthToken();
-    }
-
     protected function preTreatBeforeSaving($entity, $requestParameters)
     {
         #treat field before saving it
@@ -138,7 +127,7 @@ class BaseUIController
             && $this->entities[$entity]['schema']['by_user'] == true
         )
         {
-            $session_data = $this->session->find(BaseUIController::USER_AUTH_COOKIE);
+            $session_data = $this->session->find('backoffice_service_token');
             $requestParameters['user_uuid'] = $session_data['uuid'];
         }
 
@@ -184,6 +173,16 @@ class BaseUIController
             }
         }
         return $requestParameters;
+    }
+
+    public function lookForServerErrorsOnResponse($data)
+    {
+        if(
+            isset($data['error_code'])
+            && isset($data['error_message'])
+        ) {
+            $this->view->setVariable('alert_message', ['type' => 'error', 'message' => $data['error_message']]);
+        }
     }
 
 }

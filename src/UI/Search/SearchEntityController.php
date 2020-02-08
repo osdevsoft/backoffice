@@ -48,14 +48,14 @@ class SearchEntityController extends BaseUIController
      */
     public function search($entity)
     {
-
         $messageObject = $this->getEntityMessageObject($entity);
         $data = $this->queryBus->ask($messageObject);
+
+        $this->lookForServerErrorsOnResponse($data);
 
         $this->setViewVariables($entity, $data);
 
         $this->view->setTemplate('actions/list');
-
         $this->view->render();
 
     }
@@ -106,18 +106,22 @@ class SearchEntityController extends BaseUIController
         $this->view->setVariable('required_entities_contents', isset($data['required_entities_contents']) ? $data['required_entities_contents'] : null);
 
         $this->view->setVariable('GET', $this->request->parameters['get']);
-        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request));
+        if($this->view->getVariable('alert_message') == null) {
+            $this->view->setVariable('alert_message', UI::getAlertMessages($this->request->parameters));
+        }
 
         if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);
             $this->view->setVariable('query_string_search_fields',
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
         }
-        $pagination_variables = $this->view->generatePagination(
-            $data['total_items'],
-            $this->config['backoffice']['pagination']);
-        $this->view->setVariable('paginator', $pagination_variables['paginator']);
-        $this->view->setVariable('items_per_page', $pagination_variables['items_per_page']);
+        if(isset($data['total_items'])) {
+            $pagination_variables = $this->view->generatePagination(
+                $data['total_items'],
+                $this->config['backoffice']['pagination']);
+            $this->view->setVariable('paginator', $pagination_variables['paginator']);
+            $this->view->setVariable('items_per_page', $pagination_variables['items_per_page']);
+        }
     }
 
 }

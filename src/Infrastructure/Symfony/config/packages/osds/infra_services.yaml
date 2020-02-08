@@ -15,6 +15,22 @@ services:
     class: Osds\DDDCommon\Infrastructure\Communication\OutputRequest
     public: true
     arguments:
+      - "@ServiceAuth"
       - "%env(API_URL)%"
-      - "%env(API_AUTH_USERNAME)%"
-      - "%env(API_AUTH_PASSWORD)%"
+
+  ServiceAuth:
+    class: Osds\Auth\Infrastructure\UI\ServiceAuth
+    public: true
+    arguments:
+      - "@Session"
+      - "%env(SERVICE_AUTH_URL)%"
+      - "%env(SERVICE_AUTH_USERNAME)%"
+      - "%env(SERVICE_AUTH_PASSWORD)%"
+      - ""
+
+  UserAuth:
+    class: Osds\Auth\Infrastructure\UI\UserAuth
+    public: true
+    arguments:
+      - "@Session"
+      - "@OutputRequest"

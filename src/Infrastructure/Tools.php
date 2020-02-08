@@ -4,13 +4,14 @@ namespace Osds\Backoffice\Infrastructure;
 
 use Osds\Backoffice\Infrastructure\Helpers\Path;
 use Osds\DDDCommon\Infrastructure\Helpers\File;
+use Osds\DDDCommon\Infrastructure\Helpers\Server;
 
 class Tools
 {
 
     public static function loadSiteConfiguration()
     {
-        $configuration_path = Path::getPath('sites_configurations', 'samplesite_sandbox', true);
+        $configuration_path = Path::getPath('sites_configurations', Server::getDomainInfo()['snakedId'], true);
         $path_file = $configuration_path . 'backoffice.yml';
         if (!is_file($path_file)) {
             return false;
@@ -21,7 +22,7 @@ class Tools
     public static function getTemplateJSForTinyMce()
     {
         $templateBlocksPath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/osds/template-blocks/assets/blocks/';
-        $backOfficecachePath = Path::getPath('backoffice_cache', 'samplesite_sandbox', true, true);
+        $backOfficecachePath = Path::getPath('backoffice_cache', Server::getDomainInfo()['snakedId'], true, true);
         $templateBlocksCacheFile = $backOfficecachePath . '/tinymce_definitions.json';
         if(
             file_exists($templateBlocksCacheFile)

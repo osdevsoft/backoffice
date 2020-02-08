@@ -2,16 +2,14 @@
 
 namespace Osds\Backoffice\UI\Login;
 
-use Osds\Auth\Infrastructure\UI\StaticClass\Auth;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
 use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
-use Osds\Backoffice\Application\Search\SearchEntityQueryBus;
 
-use Osds\Backoffice\Application\Search\SearchEntityQuery;
+use Osds\Auth\Infrastructure\UI\UserAuth;
 
 use Osds\DDDCommon\Infrastructure\Helpers\UI;
 
@@ -21,16 +19,16 @@ use Osds\DDDCommon\Infrastructure\Helpers\UI;
 class PostLoginFormController extends BaseUIController
 {
 
-    private $query_bus;
+    private $userAuth;
 
     public function __construct(
         SessionRepository $session,
         ViewInterface $view,
         LoadLocalizationApplication $loadLocalizationApplication,
-        SearchEntityQueryBus $queryBus
+        UserAuth $userAuth
     )
     {
-        $this->query_bus = $queryBus;
+        $this->userAuth = $userAuth;
 
         parent::__construct($session, $view, $loadLocalizationApplication);
 
@@ -50,8 +48,8 @@ class PostLoginFormController extends BaseUIController
         $this->build();
 
         $requestParameters = $this->request->parameters['post'];
-        $authUser = Auth::getUserAuthToken(
-            'http://api.osdshub.sandbox/api/',
+        $authUser = $this->userAuth->getUserAuthToken(
+            $this->session,
             $requestParameters['email'],
             $requestParameters['password'],
             'backoffice'
@@ -62,15 +60,6 @@ class PostLoginFormController extends BaseUIController
         } else {
             UI::redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
         }
-
-    }
-
-    public function getEntityMessageObject($entity, $request)
-    {
-        return new SearchEntityQuery(
-            $entity,
-            $request
-        );
 
     }
 

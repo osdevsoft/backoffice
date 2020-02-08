@@ -58,6 +58,8 @@ class FindEntityController extends BaseUIController
         $message_object = $this->getEntityMessageObject($entity, $this->request);
         $data = $this->queryBus->ask($message_object);
 
+        $this->lookForServerErrorsOnResponse($data);
+
         $this->setViewVariables($entity, $data);
 
         $this->view->setTemplate('actions/detail');
@@ -94,7 +96,7 @@ class FindEntityController extends BaseUIController
         $this->view->setVariable('referenced_entities_contents', isset($data['referenced_entities_contents']) ? $data['referenced_entities_contents'] : null);
 
         $this->view->setVariable('GET', $this->request->parameters['get']);
-        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request));
+        $this->view->setVariable('alert_message', UI::getAlertMessages($this->request->parameters));
 
         if (!empty($this->request->parameters['get']) && !empty($this->request->parameters['get']['search_fields'])) {
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);

@@ -9,6 +9,7 @@ class Path extends DDDCommonHelperPath
 
     protected static $paths = [
         'sites_configurations' => '/sites_configurations/%s/user/config/',
+        'static_pages_cache' => '/sites_configurations/%s/public/cache/front/static_pages/',
         'backoffice_cache' => '/sites_configurations/%s/public/cache/backoffice/',
         'public' => '/public/',
         'localization' => '/vendor/osds/backoffice/assets/localization/',

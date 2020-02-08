@@ -5,11 +5,7 @@ namespace Osds\Backoffice\Infrastructure\Export;
 class ExportToHTMLService
 {
 
-    public static function execute($domainData, $seo_name, $language = null) {
-        $domainData = [
-            'mainDomain' => 'http://samplesite.sandbox',
-            'snakedId' => 'samplesite_sandbox'
-        ];
+    public static function execute($origin, $destiny) {
         $path = $_SERVER['DOCUMENT_ROOT'] . '/../sites_configurations/' . $domainData['snakedId'] . '/public/cache/front/static_pages/';
         if(!is_dir($path)) {
             mkdir($path, 0777, true);

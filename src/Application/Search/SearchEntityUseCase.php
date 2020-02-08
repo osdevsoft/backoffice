@@ -18,9 +18,8 @@ final class SearchEntityUseCase
 
     public function execute($entity, $requestParameters)
     {
-
         $this->outputRequest->setQuery($entity, 'get', $requestParameters);
-        $response = $this->outputRequest->sendRequest();
+        $response = $this->outputRequest->sendRequest('backoffice');
 
         return $response;
 

@@ -2,21 +2,36 @@
 
 namespace Osds\Backoffice\Application\Update\StaticPage;
 
-use Osds\Backoffice\Infrastructure\Export\ExportToHTMLService;
+use Osds\Backoffice\Infrastructure\Helpers\Path;
+use Osds\DDDCommon\Infrastructure\Export\ExportUrlToHTML;
+use Osds\DDDCommon\Infrastructure\Helpers\Server;
 
 class UpdateStaticPageUseCase
 {
 
     public function execute($data)
     {
-        #save into html
-        $multilanguage_page = json_decode($data['post']['seo_name'], true);
-        if(is_array($multilanguage_page)) {
-            foreach($multilanguage_page as $language => $language_page) {
-                ExportToHTMLService::execute(getDomainData(), $language_page, $language);
+        $domainData = Server::getDomainInfo();
+        $baseDestinyPath = Path::getPath('static_pages_cache', $domainData['snakedId'], true, true);
+        $baseOriginUrl = $domainData['protocol'] . '://' . $domainData['mainDomain'];
+
+        $exportUrlToHtmlService = new ExportUrlToHTML();
+
+        #is a multilanguage page?
+        $multilanguagePage = json_decode($data['post']['seo_name'], true);
+        if(is_array($multilanguagePage)) {
+            foreach($multilanguagePage as $language => $pageName) {
+                $exportUrlToHtmlService->store(
+                    "{$baseOriginUrl}/{$pageName}?reloadOsdsCache&lang={$language}",
+                    $baseDestinyPath . $pageName
+                );
             }
         } else {
-            ExportToHTMLService::execute(getDomainData(), $data['post']['seo_name']);
+            $pageName = $data['post']['seo_name'];
+            $exportUrlToHtmlService->store(
+                "{$baseOriginUrl}/{$pageName}?reloadOsdsCache",
+                $baseDestinyPath . $pageName
+            );
         }
 
         return $data;
@@ -24,22 +39,3 @@ class UpdateStaticPageUseCase
 
 }
 
-function getDomainData()
-{
-//    if(!isset($_REQUEST['domain'])) die('you must send $domain get variable');
-//    return $_REQUEST['domain'];
-
-    $requestOrigin = $_SERVER['SERVER_NAME'];
-    
-    $domainData = [
-        'requestOrigin' => $requestOrigin,
-        'mainDomain' => '',
-        'snakedId' => ''
-    ];
-    $domainData['mainDomain'] = preg_replace('/^backoffice./','', $requestOrigin);
-    $domainData['snakedId'] = str_replace('www.','', $domainData['mainDomain']);
-//    $domainData['snakedId'] = preg_replace('/.sandbox$/','', $domain);
-    $domainData['snakedId'] = preg_replace('/[^a-zA-Z0-9]/', '_', $domainData['snakedId']);
-
-    return $domainData;
-}

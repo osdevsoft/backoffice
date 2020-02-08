@@ -20,7 +20,7 @@ class InsertEntityUseCase
     {
 
         $this->outputRequest->setQuery($entity, 'post', $requestParameters);
-        $response = $this->outputRequest->sendRequest();
+        $response = $this->outputRequest->sendRequest('backoffice');
 
         return $response;
 

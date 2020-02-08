@@ -20,7 +20,7 @@ final class DeleteEntityUseCase
     {
 
         $this->outputRequest->setQuery($entity, 'delete', $requestParameters);
-        $response = $this->outputRequest->sendRequest();
+        $response = $this->outputRequest->sendRequest('backoffice');
 
         return $response;
 

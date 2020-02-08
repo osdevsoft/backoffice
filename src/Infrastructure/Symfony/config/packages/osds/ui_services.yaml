@@ -24,7 +24,7 @@ services:
             - "@Session"
             - "@SmartyView"
             - "@LoadLocalizationApplication"
-            - "@Osds\\Backoffice\\Application\\Search\\SearchEntityQueryBus"
+            - "@UserAuth"
         tags: ['controller.service_arguments']
 
     Osds\Backoffice\UI\Search\SearchEntityController:

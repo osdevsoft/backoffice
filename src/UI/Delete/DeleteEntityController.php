@@ -58,6 +58,8 @@ class DeleteEntityController extends BaseUIController
             $messageObject = $this->getEntityMessageObject($entity, $requestParameters);
             $result = $this->commandBus->dispatch($messageObject);
 
+            $this->lookForServerErrorsOnResponse($result);
+
             #redirect to detail
             if (isset($result['items'][0]['deleted_id'])) {
                 UI::redirect($redirectUrl, "success", "delete_ok");

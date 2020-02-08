@@ -58,6 +58,8 @@ class InsertEntityController extends BaseUIController
             $messageObject = $this->getEntityMessageObject($entity, $requestParameters);
             $result = $this->commandBus->dispatch($messageObject);
 
+            $this->lookForServerErrorsOnResponse($result);
+
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
                 UI::redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "create_ok");
