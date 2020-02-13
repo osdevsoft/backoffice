@@ -24,7 +24,7 @@ class UpdateEntityUseCase
 
         #TODO: make generic
         if($entity == 'static_page') {
-            $entityCustomUseCase = 'Osds\Backoffice\Application\Update\StaticPage\UpdateStaticPageUseCase';
+            $entityCustomUseCase = 'Osds\Backoffice\Application\StaticPage\ClearStaticPageCache';
             if(class_exists($entityCustomUseCase)) {
                 $entityCustomUseCase = new $entityCustomUseCase;
                 $entityCustomUseCase->execute($requestParameters);

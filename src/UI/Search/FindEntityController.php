@@ -51,7 +51,7 @@ class FindEntityController extends BaseUIController
     {
 
         $referencedEntitiesRequest = $this->getReferencedEntitiesToRequest($entity, $this->config);
-        $this->request->parameters = array_merge($this->request->parameters, $referencedEntitiesRequest);
+        $this->request->parameters['get'] = array_merge($this->request->parameters['get'], $referencedEntitiesRequest['get']);
         
         $this->request->parameters['get']['search_fields']['uuid'] = $uuid;
 
@@ -66,8 +66,6 @@ class FindEntityController extends BaseUIController
 
         $this->view->render();
 
-//        $referenced_contents['twig_vars'] = $this->getReferencedContents($data['schema'], $model);
-//        $data = array_merge($data, $referenced_contents);
     }
 
     public function getEntityMessageObject($entity, $request)
@@ -104,6 +102,8 @@ class FindEntityController extends BaseUIController
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
         }
 
+
+        $this->view->setVariable('theme_style_sheet', Tools::getStylesForTinyMce());
         $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
     }
 

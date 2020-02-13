@@ -127,7 +127,7 @@ class BaseUIController
             && $this->entities[$entity]['schema']['by_user'] == true
         )
         {
-            $session_data = $this->session->find('backoffice_service_token');
+            $session_data = $this->session->find('backoffice_user_token');
             $requestParameters['user_uuid'] = $session_data['uuid'];
         }
 

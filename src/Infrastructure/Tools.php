@@ -26,7 +26,7 @@ class Tools
         $templateBlocksCacheFile = $backOfficecachePath . '/tinymce_definitions.json';
         if(
             file_exists($templateBlocksCacheFile)
-            && !isset($_REQUEST['reloadCache'])
+            && !isset($_REQUEST['reloadOsdsCache'])
         ) {
             return file_get_contents($templateBlocksCacheFile);
         }
@@ -41,6 +41,11 @@ class Tools
         file_put_contents($templateBlocksCacheFile, json_encode($blocks));
 
         return json_encode($blocks);
+    }
+
+    public static function getStylesForTinyMce()
+    {
+        return '/' . Server::getDomainInfo()['snakedId'] . '/styles/blocks.css';
     }
 
 }

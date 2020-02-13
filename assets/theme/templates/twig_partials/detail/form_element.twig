@@ -13,7 +13,6 @@
     {# field has some value #}
     {# we already know it's multilanguage because we have "language" var set (from form.twig) #}
     {# maybe it's the first time in here (now we want multilang) so it could not be an array#}
-    {#{% set field_value = data[field][language] %}#}
     {% set field_value = field|getLocalizedValue(entities_list[entity_name].schema.multilanguage_fields, data[field], language) %}
 {% endif %}
 
@@ -102,8 +101,8 @@
                         <script>
                             $(document).ready(function() {
                                 tinymce.init({
-                                    'language': '{{ config.crm.language }}',
-                                    content_css: "{{ theme_style_sheet }}",
+                                    'language': '{{ config.backoffice.language }}',
+                                    content_css: '{{ theme_style_sheet|raw }}',
                                     selector: ".richtext",
                                     height: 300,
                                     plugins: "image visualblocks table fullscreen layer template code",
