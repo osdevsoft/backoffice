@@ -7,13 +7,12 @@
       "email": "info@osds.com"
     }
   ],
-  "minimum-stability": "dev",
-  "version": "0.1",
+  "version": "1.0.0",
   "require": {
     "phpunit/phpunit": "^7.0",
-    "guzzlehttp/guzzle": "6.3.*",
-    "symfony/yaml": "4.2.*",
-    "doctrine/annotations": "1.6.*"
+    "guzzlehttp/guzzle": "^6.3",
+    "symfony/yaml": "^5.0",
+    "doctrine/annotations": "^1.8"
   },
 
   "autoload": {
