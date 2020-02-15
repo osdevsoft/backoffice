@@ -7,8 +7,9 @@
 {% else %}
     {% set is_field_fillable = false %}
 {% endif %}
+
 {% if language is not null
-    and data[field] is not null
+    and data[field] is defined
 %}
     {# field has some value #}
     {# we already know it's multilanguage because we have "language" var set (from form.twig) #}
@@ -48,7 +49,7 @@
     {% if referenced_entity is not null %}
         {% set printed = true %}
         <select class="form-control" style="width:100%" name="{{ referenced_entity ~ '.uuid' }}"
-                {% if field_info is not null and field_info.type == "select-finder" %}
+                {% if field_info is defined and field_info.type is defined and field_info.type == "select-finder" %}
                     data-placeholder="..." class="chosen-select"
                 {% endif %}
         >
@@ -75,7 +76,7 @@
         </select>
 
         {% if field_info is not null %}
-            {% if field_info.type == "select-finder" %}
+            {% if field_info.type is defined and field_info.type == "select-finder" %}
                 <script type="text/javascript">
                     $(function () {
                         $('[name="{{ referenced_entity ~ '_uuid' }}"]').chosen();
@@ -87,11 +88,11 @@
         {# just display a form element#}
         {% if field_info is not null %}
             {# field has specific settings #}
-            {% if field_info.classes is not null %}
+            {% if field_info.classes is defined and field_info.classes is not null %}
                 {# classes for the form element #}
                 {% set classes = field_info.classes %}
             {% endif %}
-            {% if  field_info.type is not null %}
+            {% if field_info.type is defined and field_info.type is not null %}
                 {% if field_info.type == "textarea" %}
                     {% if 'richtext' in field_info.classes %}
                         {% set printed = true %}

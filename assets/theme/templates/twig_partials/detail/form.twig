@@ -26,7 +26,7 @@
 
     <form id="detail_submit" action="{{ form_action }}" method="post" enctype="multipart/form-data" role="form">
 
-        {% if GET is not null and GET.creation_vars is not null and GET.creation_vars is iterable %}
+        {% if GET is not null and GET.creation_vars is defined and GET.creation_vars is iterable %}
             {% for key, value in GET.creation_vars %}
                 <input type="hidden" name="{{ key }}" value="{{ value }}" />
             {% endfor %}
@@ -46,7 +46,7 @@
                 {% endif %}
 
 
-                {% if field_info.tooltip is not null %}
+                {% if field_info.tooltip is defined %}
                     {# display a tooltip #}
                     <span title="{{ field_info.tooltip }}" style="cursor: default; font-size: 1.5em; color: royalblue">&#9432;</span>
                 {% endif %}
@@ -74,7 +74,6 @@
                                                 'entity_name': entity_name,
                                                 'entities_list': entities_list,
                                                 'entities_metadata': entities_metadata,
-                                                'is_field_fillable': is_field_fillable,
                                                 'field': field,
                                                 'field_info': field_info,
                                                 'referenced_entities_contents': referenced_entities_contents,
@@ -89,12 +88,12 @@
 
                 {% else %}
                     {% include 'twig_partials/detail/form_element.twig' with {
+                    'language': '',
                     'data': data,
                     'config': config,
                     'entity_name': entity_name,
                     'entities_list': entities_list,
                     'entities_metadata': entities_metadata,
-                    'is_field_fillable': is_field_fillable,
                     'field': field,
                     'field_info': field_info,
                     'referenced_entities_contents': referenced_entities_contents,

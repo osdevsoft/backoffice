@@ -85,6 +85,8 @@ class FindEntityController extends BaseUIController
         $this->view->setVariable('config', $this->config);
 
         $this->view->setVariable('entity', $entity);
+        $this->view->setVariable('current_entity', $entity);
+
         $this->view->setVariable('entities_list', $this->config['backoffice']['entities']);
         $this->view->setVariable('action', 'detail');
 
@@ -102,6 +104,7 @@ class FindEntityController extends BaseUIController
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
         }
 
+        $this->view->setVariable('entities_metadata', $this->config['backoffice']['entities']);
 
         $this->view->setVariable('theme_style_sheet', Tools::getStylesForTinyMce());
         $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());

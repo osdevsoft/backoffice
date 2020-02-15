@@ -43,7 +43,7 @@
             }
         %}
 
-        {% if entities_list[entity]['related_entities']|length > 0 %}
+        {% if entities_list[entity]['related_entities'] is defined and entities_list[entity]['related_entities']|length > 0 %}
             <section id="referenced-entities">
                 <hr>
                 <h3>Referenced Data</h3>

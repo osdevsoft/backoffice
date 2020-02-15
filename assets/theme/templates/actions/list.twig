@@ -9,7 +9,7 @@
 {% endif %}
 
 
-{% if entities_list[entity]['fields']['in_search']|length > 0 %}
+{% if entities_list[entity]['fields']['in_search'] is defined and entities_list[entity]['fields']['in_search']|length > 0 %}
     {% set entity_searchable_fields = entities_list[entity]['fields']['in_search'] %}
 {% else %}
     {% set entity_searchable_fields = entity_viewable_fields %}
@@ -60,7 +60,7 @@
             {% endif %}
         </h3>
         <div class="box-tools">
-            {% if model_schema.user_can_create is null or model_schema.user_can_create == true %}
+            {% if model_schema.user_can_create is defined and model_schema.user_can_create == true %}
                 <a class="btn btn-info" href="/{{ model }}/create">{{ locale['Create new'] }}</a>
             {% endif %}
         </div>
