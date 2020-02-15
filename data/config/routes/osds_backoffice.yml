@@ -1,3 +1,0 @@
-osds_backoffice:
-  resource: '../vendor/osds/backoffice/src/UI/'
-  type:     annotation
