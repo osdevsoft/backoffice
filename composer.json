@@ -19,5 +19,11 @@
     "psr-4": {
       "Osds\\Backoffice\\": "src/"
     }
+  },
+
+  "scripts": {
+    "post-install-cmd": [
+      "bash ./bin/post-install.sh"
+    ]
   }
 }

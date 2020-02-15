@@ -20,17 +20,24 @@
                             {% set field_info = field|split(".") %}
                             {% set model_metadata_values = entity_metadata[field_info[0]][field_info[1]] %}
                         {% else %}
-                            {% set model_metadata_values = entity_metadata[model_name][field] %}
+                            {% if entity_metadata[current_entity][field] is defined %}
+                                {% set model_metadata_values = entity_metadata[current_entity][field] %}
+                            {% else %}
+                                {% set model_metadata_values = null %}
+                            {% endif %}
                         {% endif %}
                         {# field has been searched previously. Get its searched value #}
-                        {% if search_fields[field] is iterable %}
-                            {% set field_searched_value = search_fields[field].value %}
-                        {% else %}
-                            {% set field_searched_value = search_fields[field] %}
-                        {% endif %}
+                        {% set field_searched_value = '' %}
+                        {% if search_fields is defined  %}
+                            {% if search_fields[field] is iterable %}
+                                {% set field_searched_value = search_fields[field].value %}
+                            {% else %}
+                                {% set field_searched_value = search_fields[field] %}
+                            {% endif %}
 
-                        {%  if field_searched_value != "" %}
-                        {% set display_search = true %}
+                            {%  if field_searched_value != "" %}
+                                {% set display_search = true %}
+                            {% endif %}
                         {% endif %}
 
                         {%  set printed = false %}
@@ -40,7 +47,7 @@
 
                             <label for="search_fields[{{ field }}]">{{ field|replace({'.': ' ', '_': " "}) }}</label>
 
-                            {% if 'timestamp' in field_metadata.Type %}
+                            {% if field_metadata.type is defined and 'timestamp' in field_metadata.type %}
                                 {% set printed = true %}
                                 <input  type="text" class="datepicker form-control" placeholder="YYYY-MM-DD" name="search_fields[{{ field }}]" value="{{ field_searched_value }}">
                             {% endif %}
@@ -59,7 +66,7 @@
 
                             {% if not printed %}
                                 <input type="text" class="form-control" id="search_fields[{{ field }}]" name="search_fields[{{ field }}][value]" value="{{ field_searched_value }}">
-                                {% if 'varchar' in field_metadata.Type %}
+                                {% if field_metadata.type is defined and 'varchar' in field_metadata.type %}
                                     <input type="hidden" name="search_fields[{{ field }}][operand]" value="LIKE">
                                 {% endif %}
                             {% endif %}

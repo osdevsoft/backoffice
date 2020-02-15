@@ -77,7 +77,7 @@
 
 
                 <th>
-                        {% if model_fields_schema[field].nice_name is not null %}
+                        {% if model_fields_schema[field].nice_name is defined %}
                             {{ model_fields_schema[field].nice_name }}
                         {% else %}
                             {{ field|replace({'.': ' ', '_': " "}) }}
@@ -102,7 +102,7 @@
                             {% set referenced_field_data = field|split('.') %}
                             {% set referenced_model = referenced_field_data[0] %}
                             {% set referenced_field = referenced_field_data[1] %}
-                            {% if models_metadata[referenced_model][referenced_field] is not null %}
+                            {% if models_metadata is defined and models_metadata[referenced_model][referenced_field] is not null %}
                                 {#field nice value is defined on model metadata#}
                                 {% set printed = true %}
                                 {% set referenced_model_field_value = item['relations'][referenced_model]['items'][0][referenced_field] %}
@@ -134,18 +134,18 @@
                             {% endif %}
 
                             <td>
-                                {% if models_metadata[entity][field] is not null %}
+                                {% if models_metadata is defined and models_metadata[entity][field] is not null %}
                                     {#field nice value is defined on model metadata#}
                                     {% set printed = true %}
                                     {{ models_metadata[entity][field]['by_id'][item[field]] }}
                                 {% else %}
                                     {# it's a non fillable field #}
 
-                                    {% if model_fields_schema[field] is not null %}
+                                    {% if model_fields_schema[field] is defined %}
 
                                         {# check if it's a rich text field #}
                                         {% set field_info = model_fields_schema[field] %}
-                                        {% if 'richtext' in field_info.classes and item[field] is not null and item[field] != "" %}
+                                        {% if field_info.classes is defined and 'richtext' in field_info.classes and item[field] is not null and item[field] != "" %}
                                             {% set printed = true %}
                                             {{ field_value|raw }}
                                         {% endif %}

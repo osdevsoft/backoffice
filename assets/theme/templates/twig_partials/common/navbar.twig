@@ -18,18 +18,18 @@
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
             {% for entity in entities_list|keys %}
-                {% if entities_list[entity]['schema']['visible_in_navbar'] is null or entities_list[entity]['schema']['visible_in_navbar'] == true %}
+                {% if entities_list[entity]['schema']['visible_in_navbar'] is not defined or entities_list[entity]['schema']['visible_in_navbar'] == true %}
 
                     {% if entities_list[entity].schema is not null and entities_list[entity].schema.nice_name is not null %}
-                        {% set model_name =  entities_list[entity].schema.nice_name %}
+                        {% set entity_name =  entities_list[entity].schema.nice_name %}
                     {% else %}
-                        {% set model_name =  entity %}
+                        {% set entity_name =  entity %}
                     {% endif %}
 
-                    <li {% if entity == model %}class="active"{% endif %}>
+                    <li {% if entity == current_entity %}class="active"{% endif %}>
                         <a href="/{{ entity }}">
                             <i class="fa fa-{{ entities_list[entity].schema.icon }}"></i>
-                            <span>{{ model_name }}</span>
+                            <span>{{ entity_name }}</span>
                         </a>
 
                 {% endif %}

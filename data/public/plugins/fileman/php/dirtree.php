@@ -1,4 +1,5 @@
 <?php
+
 /*
   RoxyFileman - web based file manager. Ready to use with CKEditor, TinyMCE. 
   Can be easily integrated with any other WYSIWYG editor or CMS.
@@ -23,9 +24,9 @@
 include '../system.inc.php';
 include 'functions.inc.php';
 
+
 verifyAction('DIRLIST');
 checkAccess('DIRLIST');
-
 function getFilesNumber($path, $type){
   $files = 0;
   $dirs = 0;
@@ -63,6 +64,7 @@ function GetDirs($path, $type){
 $type = (empty($_GET['type'])?'':strtolower($_GET['type']));
 if($type != 'image' && $type != 'flash')
   $type = '';
+
 
 echo "[\n";
 $tmp = getFilesNumber(fixPath(getFilesPath()), $type);

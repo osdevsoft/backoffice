@@ -97,6 +97,7 @@ class SearchEntityController extends BaseUIController
     public function setViewVariables($entity, $data): void
     {
         $this->view->setVariable('entity', $entity);
+        $this->view->setVariable('current_entity', $entity);
         $this->view->setVariable('entities_list', $this->config['backoffice']['entities']);
         $this->view->setVariable('action', 'list');
 
@@ -114,6 +115,8 @@ class SearchEntityController extends BaseUIController
             $this->view->setVariable('search_fields', $this->request->parameters['get']['search_fields']);
             $this->view->setVariable('query_string_search_fields',
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
+        } else {
+            $this->view->setVariable('query_string_search_fields', '');
         }
         if(isset($data['total_items'])) {
             $pagination_variables = $this->view->generatePagination(
@@ -122,6 +125,11 @@ class SearchEntityController extends BaseUIController
             $this->view->setVariable('paginator', $pagination_variables['paginator']);
             $this->view->setVariable('items_per_page', $pagination_variables['items_per_page']);
         }
+
+        #TODO: entity_metadata are the constants defined on the entity
+        $this->view->setVariable('entity_metadata', $this->config['backoffice']['entities'][$entity]['fields']['fields_schema']);
+
+        $this->view->setVariable('config', $this->config);
     }
 
 }

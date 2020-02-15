@@ -95,7 +95,7 @@ function getErrorRes($str = ''){
 function getFilesPath(){
   $ret = (isset($_SESSION[SESSION_PATH_KEY]) && $_SESSION[SESSION_PATH_KEY] != ''?$_SESSION[SESSION_PATH_KEY]:FILES_ROOT);
   if(!$ret){
-      $upload_path = BASE_PATH.'/../../upload/' . $_SESSION['site_id'] . '/files';
+    $upload_path = BASE_PATH.'/../../' . getDomainInfo()['snakedId'] . '/upload/files';
     $ret = RoxyFile::FixPath($upload_path);
     if(!is_dir($ret))
     {
@@ -107,6 +107,24 @@ function getFilesPath(){
     $ret = str_replace(RoxyFile::FixPath($tmp), '', $ret);
   }
   return $ret;
+}
+// from vendor/osds/ddd-common/src/Infrastructure/Helpers/Server
+function getDomainInfo()
+{
+    $requestOrigin = str_replace($_SERVER['REQUEST_SCHEME'] . '://', '', $_SERVER['HTTP_HOST']);
+
+    $domainData = [
+        'protocol' => $_SERVER['REQUEST_SCHEME'],
+        'requestOrigin' => $requestOrigin,
+        'mainDomain' => '',
+        'snakedId' => ''
+    ];
+    $domainData['mainDomain'] = preg_replace('/^backoffice./','', $requestOrigin);
+    $domainData['snakedId'] = str_replace('www.','', $domainData['mainDomain']);
+//    $domainData['snakedId'] = preg_replace('/.sandbox$/','', $domain);
+    $domainData['snakedId'] = preg_replace('/[^a-zA-Z0-9]/', '_', $domainData['snakedId']);
+
+    return $domainData;
 }
 function listDirectory($path){
   $ret = @scandir($path);
@@ -124,6 +142,7 @@ function listDirectory($path){
   return $ret;
 }
 class RoxyFile{
+
   static public function CheckWritable($dir){
     $ret = false;
     if(self::CreatePath($dir)){
@@ -490,6 +509,8 @@ if($tmp){
 else
   die('Error parsing configuration');
 $FilesRoot = fixPath(getFilesPath());
-if(!is_dir($FilesRoot))
+if(!is_dir($FilesRoot)) {
   @mkdir($FilesRoot, octdec(DIRPERMISSIONS));
+}
+
 ?>

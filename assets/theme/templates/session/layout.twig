@@ -11,11 +11,11 @@
     <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 
     <style>
-        {{ css_file_contents }}
+        {#{{ css_file_contents }}#}
     </style>
 
     <script>
-        {{ js_file_contents|raw }}
+        {#{{ js_file_contents|raw }}#}
     </script>
 
 </head>
@@ -26,7 +26,7 @@
 </div>
 
 <div id="content">
-    {% if alert_message is not null %}
+    {% if alert_message is defined and alert_message is not null %}
         <div class="alert alert-message alert-{{ alert_message.type }}">{{ alert_message.message }}</div>
     {% endif %}
     {% block contents " " %}

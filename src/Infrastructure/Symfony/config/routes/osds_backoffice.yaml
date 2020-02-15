@@ -1,4 +1,4 @@
 
-osds_api:
-  resource: '../vendor/osds/backoffice/src/UI/'
+osds_backoffice:
+  resource: '../../vendor/osds/backoffice/src/UI/'
   type:     annotation
