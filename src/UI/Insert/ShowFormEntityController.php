@@ -84,6 +84,8 @@ class ShowFormEntityController extends BaseUIController
         $this->view->setVariable('config', $this->config);
 
         $this->view->setVariable('entity', $entity);
+        $this->view->setVariable('current_entity', $entity);
+
         $this->view->setVariable('entities_list', $this->config['backoffice']['entities']);
         $this->view->setVariable('action', 'detail');
 
@@ -96,8 +98,11 @@ class ShowFormEntityController extends BaseUIController
                 http_build_query(['search_fields' => $this->request->parameters['get']['search_fields']]));
         }
 
+        $this->view->setVariable('entities_metadata', $this->config['backoffice']['entities']);
+
         $this->view->setVariable('referenced_entities_contents', isset($data['referenced_entities_contents']) ? $data['referenced_entities_contents'] : null);
 
+        $this->view->setVariable('theme_style_sheet', Tools::getStylesForTinyMce());
         $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
     }
     

@@ -34,7 +34,7 @@ class ShowLoginFormController extends BaseUIController
      *     methods={"GET"},
      * )
      * @Route(
-     *     "/",
+     *     "",
      *     methods={"GET"}
      * )
      */

@@ -51,8 +51,10 @@ class FindEntityController extends BaseUIController
     {
 
         $referencedEntitiesRequest = $this->getReferencedEntitiesToRequest($entity, $this->config);
-        $this->request->parameters['get'] = array_merge($this->request->parameters['get'], $referencedEntitiesRequest['get']);
-        
+        if(isset($referencedEntitiesRequest['get'])) {
+            $this->request->parameters['get'] = array_merge($this->request->parameters['get'], $referencedEntitiesRequest['get']);
+        }
+
         $this->request->parameters['get']['search_fields']['uuid'] = $uuid;
 
         $message_object = $this->getEntityMessageObject($entity, $this->request);

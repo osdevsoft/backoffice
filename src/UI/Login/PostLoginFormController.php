@@ -56,7 +56,7 @@ class PostLoginFormController extends BaseUIController
         );
 
         if ($authUser != null) {
-            UI::redirect('/user');
+            UI::redirect('/static_page');
         } else {
             UI::redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
         }

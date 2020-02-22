@@ -14,6 +14,12 @@
     {% set entity_nice_name = entity %}
 {% endif %}
 
+{% if data[0] is defined %}
+    {% set data = data[0] %}
+{% else %}
+    {% set data = [] %}
+{% endif %}
+
 {% block contents %}
 
     <section class="content-header">
@@ -36,7 +42,7 @@
         {% include 'twig_partials/detail/form.twig'
             with {
                 'form_action': form_action,
-                'data': data[0],
+                'data': data,
                 'entities': entities_list,
                 'entity_name': entity,
                 'referenced_entities_contents': referenced_entities_contents

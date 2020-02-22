@@ -8,6 +8,7 @@
     {% set is_field_fillable = false %}
 {% endif %}
 
+{% set field_value = null %}
 {% if language is not null
     and data[field] is defined
 %}
@@ -28,20 +29,23 @@
         {% set entity_or_field_name = referenced_field_data[i] %}
         {% if i != (referenced_field_data|length - 1) %}
             {# it's not the last element => it's an entity #}
-            {% set referenced_entity_data = referenced_entity_data['references'][entity_or_field_name][0] %}
+            {% if referenced_entity_data['references'] is defined %}
+                {% set referenced_entity_data = referenced_entity_data['references'][entity_or_field_name][0] %}
+            {% endif %}
             {% set referenced_entity = entity_or_field_name %}
         {% else %}
             {# it's the last element => it's the field => get the value #}
-            {% set field_value = referenced_entity_data[entity_or_field_name] %}
+            {% if referenced_entity_data[entity_or_field_name] is defined %}
+                {% set field_value = referenced_entity_data[entity_or_field_name] %}
+            {% endif %}
             {% set referenced_field = entity_or_field_name %}
         {% endif %}
     {% endfor %}
 {% endif %}
 
-{% if field_value is null %}
+{% if (field_value is not defined or field_value is null) and data[field] is defined %}
     {% set field_value = data[field] %}
 {% endif %}
-
 {#display field value #}
 {% if is_field_fillable %}
     {# value can be modified #}
@@ -55,22 +59,24 @@
         >
             <option value=""></option>
             {% for referenced_item_data in referenced_entities_contents[referenced_entity] %}
-                {%  set field_value = referenced_field|getLocalizedValue(entities_list[referenced_entity].schema.multilanguage_fields, referenced_item_data[referenced_field], config.backoffice.language) %}
-                {#{% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}#}
-                    {# it's multilanguage #}
-                    {#{% set field_value = "asdf" %}#}
-                {#{% else %}#}
-                    {#{% set field_value = referenced_item_data[referenced_field] %}#}
-                {#{% endif %}#}
+                {% if referenced_item_data[referenced_field] is defined %}
+                    {%  set field_value = referenced_field|getLocalizedValue(entities_list[referenced_entity].schema.multilanguage_fields, referenced_item_data[referenced_field], config.backoffice.language) %}
+                    {#{% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}#}
+                        {# it's multilanguage #}
+                        {#{% set field_value = "asdf" %}#}
+                    {#{% else %}#}
+                        {#{% set field_value = referenced_item_data[referenced_field] %}#}
+                    {#{% endif %}#}
 
-                {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
-                {% if entity_name == referenced_entity and referenced_item_data['uuid'] == data['uuid'] %}
-                    {# do nothing, it's same item of same entity#}
-                {% else %}
-                    <option
-                            value="{{ referenced_item_data['uuid'] }}"
-                            {% if referenced_item_data['uuid'] == data[referenced_entity ~ '_uuid'] %} selected="selected"{% endif %}
-                    >{{ field_value }}</option>
+                    {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
+                    {% if data['uuid'] is defined and entity_name == referenced_entity and referenced_item_data['uuid'] == data['uuid'] %}
+                        {# do nothing, it's same item of same entity#}
+                    {% else %}
+                        <option
+                                value="{{ referenced_item_data['uuid'] }}"
+                                {% if data[referenced_entity ~ '_uuid'] is defined and referenced_item_data['uuid'] == data[referenced_entity ~ '_uuid'] %} selected="selected"{% endif %}
+                        >{{ field_value }}</option>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
         </select>

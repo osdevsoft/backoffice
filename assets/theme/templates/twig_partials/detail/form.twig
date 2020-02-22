@@ -54,7 +54,7 @@
                 {#display field name #}
                 <label for="{{ field }}">
                     {% set entity_field = entity_name ~ '.' ~ field %}
-                    {% if entity_fields_schema[field].nice_name is not null %}
+                    {% if entity_fields_schema[field].nice_name is defined %}
                         {{ entity_fields_schema[field].nice_name }}
                     {% else %}
                         {{ field|replace({'.': ' ', '_': " "}) }}
@@ -89,6 +89,7 @@
                 {% else %}
                     {% include 'twig_partials/detail/form_element.twig' with {
                     'language': '',
+                    'language_array': '',
                     'data': data,
                     'config': config,
                     'entity_name': entity_name,
