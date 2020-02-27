@@ -9,7 +9,8 @@
 {% endif %}
 
 {% set field_value = null %}
-{% if language is not null
+{% if language is defined
+    and entities_list[referenced_entity].schema.multilanguage_fields is defined
     and data[field] is defined
 %}
     {# field has some value #}
@@ -58,27 +59,28 @@
                 {% endif %}
         >
             <option value=""></option>
-            {% for referenced_item_data in referenced_entities_contents[referenced_entity] %}
-                {% if referenced_item_data[referenced_field] is defined %}
-                    {%  set field_value = referenced_field|getLocalizedValue(entities_list[referenced_entity].schema.multilanguage_fields, referenced_item_data[referenced_field], config.backoffice.language) %}
-                    {#{% if referenced_item_data[entities_list[referenced_entity].fields.in_list[0]] is iterable %}#}
-                        {# it's multilanguage #}
-                        {#{% set field_value = "asdf" %}#}
-                    {#{% else %}#}
-                        {#{% set field_value = referenced_item_data[referenced_field] %}#}
-                    {#{% endif %}#}
+            {% if referenced_entities_contents is not null %}
+                {% for referenced_item_data in referenced_entities_contents[referenced_entity] %}
+                    {% if referenced_item_data[referenced_field] is defined %}
+                        {% if entities_list[referenced_entity].schema.multilanguage_fields is defined %}
+                            {# it's multilanguage #}
+                            {%  set field_value = referenced_field|getLocalizedValue(entities_list[referenced_entity].schema.multilanguage_fields, referenced_item_data[referenced_field], config.backoffice.language) %}
+                        {% else %}
+                            {% set field_value = referenced_item_data[referenced_field] %}
+                        {% endif %}
 
-                    {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
-                    {% if data['uuid'] is defined and entity_name == referenced_entity and referenced_item_data['uuid'] == data['uuid'] %}
-                        {# do nothing, it's same item of same entity#}
-                    {% else %}
-                        <option
-                                value="{{ referenced_item_data['uuid'] }}"
-                                {% if data[referenced_entity ~ '_uuid'] is defined and referenced_item_data['uuid'] == data[referenced_entity ~ '_uuid'] %} selected="selected"{% endif %}
-                        >{{ field_value }}</option>
+                        {# little hack: if referenced entity is self (static_pages parents eg), do not show self id #}
+                        {% if data['uuid'] is defined and entity_name == referenced_entity and referenced_item_data['uuid'] == data['uuid'] %}
+                            {# do nothing, it's same item of same entity#}
+                        {% else %}
+                            <option
+                                    value="{{ referenced_item_data['uuid'] }}"
+                                    {% if data[referenced_entity ~ '_uuid'] is defined and referenced_item_data['uuid'] == data[referenced_entity ~ '_uuid'] %} selected="selected"{% endif %}
+                            >{{ field_value }}</option>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </select>
 
         {% if field_info is not null %}
@@ -109,11 +111,12 @@
                             $(document).ready(function() {
                                 tinymce.init({
                                     'language': '{{ config.backoffice.language }}',
-                                    content_css: '{{ theme_style_sheet|raw }}',
+                                    content_css: ['{{ theme_style_sheet }}/cache/backoffice/blocks_defaults.css', '{{ theme_style_sheet }}/styles/blocks.css', 'https://use.fontawesome.com/releases/v5.4.1/css/all.css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css'],
                                     selector: ".richtext",
                                     height: 300,
                                     plugins: "image visualblocks table fullscreen layer template code",
                                     verify_html: false,
+                                    valid_elements: "*[*]",
                                     file_browser_callback: RoxyFileBrowser,
                                     {% if theme_blocks_json is not null %}
                                     templates: {{ theme_blocks_json|raw }}

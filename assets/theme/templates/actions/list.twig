@@ -127,7 +127,7 @@
                             {% endif %}
                         {% else %}
 
-                            {% if model_schema.multilanguage_fields is not null %}
+                            {% if model_schema.multilanguage_fields is defined %}
                                 {%  set field_value = field|getLocalizedValue(model_schema.multilanguage_fields, item[field], config.backoffice.language) %}
                             {% else %}
                                 {% set field_value = item[field] %}

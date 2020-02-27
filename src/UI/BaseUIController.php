@@ -105,7 +105,7 @@ class BaseUIController
                     $field_value = $requestParameters[$field];
                     foreach($field_schema['callbacks'] as $callback)
                     {
-                        if(Language::isMultilanguageField($field_value, $this->config['backoffice']['languages']))
+                        if(isset($this->config['backoffice']['languages']) && Language::isMultilanguageField($field_value, $this->config['backoffice']['languages']))
                         {
                             foreach($field_value as $lang => $value)
                             {

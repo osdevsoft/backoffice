@@ -12,7 +12,8 @@
     "phpunit/phpunit": "^7.0",
     "symfony/yaml": "^5.0",
     "osds/ddd-common": "^1.0",
-    "osds/auth": "^1.0"
+    "osds/auth": "^1.0",
+    "osds/template-blocks": "^1.0"
   },
 
   "autoload": {

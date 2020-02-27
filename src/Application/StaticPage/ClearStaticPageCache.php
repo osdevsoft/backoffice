@@ -12,7 +12,7 @@ class ClearStaticPageCache
     {
         $domainInfo = Server::getDomainInfo();
         $cachePath = Path::getPath('static_pages_cache', $domainInfo['snakedId'], true);
-        $result = exec("rm {$cachePath}/*");
+        $result = exec("rm {$cachePath}/*.*");
 
         return $result;
     }

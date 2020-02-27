@@ -1,6 +1,11 @@
 {% extends 'layout.twig' %}
 
-{% set form_action = '/' ~ entity ~ '/edit/' ~ data[0].uuid %}
+{% set form_action = '/' ~ entity ~ '/edit/' %}
+{% if data[0] is defined %}
+    {% set form_action = form_action ~ data[0].uuid %}
+{% else %}
+    {% set data = ['empty'] %}
+{% endif %}
 
 {% if entities_list[entity]['schema']|length > 0 %}
     {% set entity_schema = entities_list[entity]['schema'] %}

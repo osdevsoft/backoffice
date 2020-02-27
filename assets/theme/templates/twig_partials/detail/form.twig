@@ -35,7 +35,7 @@
         <div class="box-body">
 
         {% for field in entity_viewable_fields %}
-            <div class="form-group">
+            <div class="form-group" style="z-index:99999">
             {% if field != 'references' %}
 
                 {% if entity_fields_schema is not null and entity_fields_schema[field] is not null  %}
@@ -61,7 +61,7 @@
                     {% endif %}
                 </label>
 
-                {% if entity.schema.multilanguage_fields is not null and field in entity.schema.multilanguage_fields %}
+                {% if entity.schema.multilanguage_fields is defined and field in entity.schema.multilanguage_fields %}
 
                     {% for language in config.backoffice.languages %}
                         <div style="margin-left: 20px">
