@@ -12,7 +12,7 @@ $locale['LOGIN_KO'] = 'Los datos introducidos no corresponden a ningún usuario'
 $locale['CREATE_OK'] = 'Contenido creado correctamente';
 $locale['CREATE_KO'] = 'Hubo un ERROR al crear el contenido: ';
 
-$locale['EDIT_OK'] = 'Contenido actualizado correctamente';
+$locale['edit_ok'] = 'Contenido actualizado correctamente';
 $locale['EDIT_KO'] = 'Hubo un ERROR al actualizar el contenido: ';
 
 $locale['DELETE_OK'] = 'Contenido eliminado correctamente';

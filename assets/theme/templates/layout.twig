@@ -9,7 +9,7 @@
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="/theme/adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
-    {#<link rel="stylesheet" href="/theme/adminlte/bower_components/font-awesome/css/font-awesome.min.css">#}
+    <link rel="stylesheet" href="/theme/adminlte/bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
     <!-- Ionicons -->
     <link rel="stylesheet" href="/theme/adminlte/bower_components/Ionicons/css/ionicons.min.css">
@@ -57,7 +57,9 @@
             <!-- Main content -->
 
             {% if alert_message is not null %}
-                <div class="alert alert-message alert-{{ alert_message.type }}">{{ alert_message.message|raw }}</div>
+                <div class="alert alert-message alert-{{ alert_message.type }}">
+                    {{ locale[alert_message.message]|raw }}
+                </div>
             {% endif %}
             {% block contents " " %}
         </div>
