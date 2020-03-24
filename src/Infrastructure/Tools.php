@@ -2,7 +2,7 @@
 
 namespace Osds\Backoffice\Infrastructure;
 
-use Leafo\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\Compiler as ScssPhpCompiler;
 use Osds\Backoffice\Infrastructure\Helpers\Path;
 use Osds\DDDCommon\Infrastructure\Helpers\File;
 use Osds\DDDCommon\Infrastructure\Helpers\Server;
@@ -70,7 +70,7 @@ class Tools
                     $scss .= file_get_contents($tbs);
                 }
                 $scss = str_replace('%class%', '', $scss);
-                $scssCompiler = new Compiler();
+                $scssCompiler = new ScssPhpCompiler();
                 $compiledScss = $scssCompiler->compile($scss);
                 #minimize
                 $compiledScss = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $compiledScss);
@@ -79,7 +79,7 @@ class Tools
 
         }
 
-        return '/' . Server::getDomainInfo()['snakedId'];
+        return Path::getPath('public', Server::getDomainInfo()['snakedId']);
     }
 
     public static function rglob($pattern, $flags = 0) {

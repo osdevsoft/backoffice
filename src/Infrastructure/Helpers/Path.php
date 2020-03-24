@@ -12,7 +12,7 @@ class Path extends DDDCommonHelperPath
         'public_resources' => '/sites_configurations/sites/%s/public/',
         'static_pages_cache' => '/sites_configurations/sites/%s/public/cache/front/static_pages/',
         'backoffice_cache' => '/sites_configurations/sites/%s/public/cache/backoffice/',
-        'public' => '/public/',
+        'public' => '/sites/%s/',
         'sitePublicPath' => '/sites_configurations/sites/%s/public/',
         'localization' => '/vendor/osds/backoffice/assets/localization/',
         'templates' => '../vendor/osds/backoffice/assets/theme/templates'
