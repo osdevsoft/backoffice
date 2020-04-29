@@ -62,14 +62,14 @@ class InsertEntityController extends BaseUIController
 
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
-                UI::redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "create_ok");
+                UI::redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "CREATE_OK");
             } else {
-                UI::redirect($redirectUrl, "danger", "create_ko", $result['items'][0]['error_message']);
+                UI::redirect($redirectUrl, "danger", "CREATE_KO", $result['items'][0]['error_message']);
             }
 
         } catch(\Exception $e)
         {
-            UI::redirect($redirectUrl, "danger", "create_ko", $e);
+            UI::redirect($redirectUrl, "danger", "CREATE_KO", $e);
         }
 
         return true;

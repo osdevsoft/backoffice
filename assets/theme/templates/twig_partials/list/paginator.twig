@@ -2,11 +2,11 @@
 
     <ul class="pagination pagination-sm no-margin">
 
-    {% if paginator.first %}
+    {% if paginator.first is defined %}
         <li><a href="{{ paginator.first }}">&laquo;&laquo;</a></li>
     {% endif %}
 
-    {% if paginator.previous %}
+    {% if paginator.previous is defined %}
         <li><a href="{{ paginator.previous }}">&laquo;</a></li>
     {% endif %}
 
@@ -29,11 +29,11 @@
         </li>
     {% endfor %}
 
-    {% if paginator.next %}
+    {% if paginator.next is defined  %}
         <li><a href="{{ paginator.next }}">&raquo;</a></li>
     {% endif %}
 
-    {% if paginator.last %}
+    {% if paginator.last is defined  %}
         <li><a href="{{ paginator.last }}">&raquo;&raquo;</a></li>
     {% endif %}
 
