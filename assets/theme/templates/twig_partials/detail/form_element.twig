@@ -30,7 +30,7 @@
         {% set entity_or_field_name = referenced_field_data[i] %}
         {% if i != (referenced_field_data|length - 1) %}
             {# it's not the last element => it's an entity #}
-            {% if referenced_entity_data['references'] is defined %}
+            {% if referenced_entity_data['references'][entity_or_field_name][0] is defined  %}
                 {% set referenced_entity_data = referenced_entity_data['references'][entity_or_field_name][0] %}
             {% endif %}
             {% set referenced_entity = entity_or_field_name %}
@@ -160,44 +160,10 @@
 {% else %}
     <br />
     {# field not fillable, display as text #}
-    {% if entities_metadata[entity_name][field] is not null %}
-        {#field nice value is defined on entity metadata#}
+    {% if entities_metadata[entity_name][field] is defined %}
+        {# field nice value is defined on entity metadata #}
         {{ entities_metadata[entity_name][field]['by_id'][data[field]] }}
     {% else %}
-        {% if field_value is iterable %}
-            <ul>
-            {% for key, value in field_value %}
-                <li style="margin-bottom: 40px"><h4>{{ key }}</h4>
-                {% if value is iterable %}
-                    <table border="1">
-                    {% for key2, value2 in value %}
-                        <tr>
-                            {# see Api :: GetApplicationCommand :: 43 #}
-                            {% set kkey = key2|split('##') %}
-                            <td style="width:70%; padding:15px; font-weight: bold; text-transform: uppercase">{{ kkey[0] }}</td>
-                            <td style="text-align: right; padding: 15px;">
-                                <span>{{ value2 }}</span>
-                                <input type="button" class="copy_to_clipboard" value="copy" style="font-size: 11px; padding: 5px; margin: 5px;"  />
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </table>
-                {% else %}
-                    : {{ value }}
-                {% endif %}
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            {% if field_info is not null %}
-                {% if field_info.type == "s3_image" %}
-                    <a href="{{ field_value }}" target="_blank" style="position:absolute;right:5%;border:1px solid grey;">
-                        <img src="{{ field_value }}" style="float:right;height:150px;"/>
-                    </a>
-                {% endif %}
-            {% else %}
-                {{ field_value }}
-            {% endif %}
-        {% endif %}
+        {{ field_value }}
     {% endif %}
 {% endif %}

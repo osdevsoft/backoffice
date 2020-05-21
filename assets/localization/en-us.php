@@ -38,6 +38,8 @@ $locale['create'] = 'create';
 $locale['for this element'] = 'for this element';
 $locale['Save'] = 'Save';
 
+$locale['create tag'] = 'Crear tag';
+
 #common types
 $locale['static_pages.title'] = 'Title';
 $locale['static_pages.parent_id'] = 'Parent page';

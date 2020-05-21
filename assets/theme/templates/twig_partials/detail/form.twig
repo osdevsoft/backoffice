@@ -35,10 +35,11 @@
         <div class="box-body">
 
         {% for field in entity_viewable_fields %}
-            <div class="form-group" style="z-index:99999">
-            {% if field != 'references' %}
 
-                {% if entity_fields_schema is not null and entity_fields_schema[field] is not null  %}
+            {% if field != 'references' and not field|contains("_tag.") %}
+            <div class="form-group" style="z-index:99999">
+
+                {% if entity_fields_schema is not null and entity_fields_schema[field] is defined  %}
                     {# field has specific settings #}
                     {% set field_info = entity_fields_schema[field] %}
                 {% else %}
@@ -103,14 +104,28 @@
                     }
                     %}
 
+                </div>
                 {% endif %}
-
-            </div>
 
             {% endif %}
 
         {% endfor %}
         </div>
+
+        {% if referenced_entities_contents[entity_name ~ "_tag"] is defined %}
+            {% set item_tags = [] %}
+            {% if data['references'][entity_name ~ "_tag"] is defined and data['references'][entity_name ~ "_tag"].total_items is not defined %}
+                {% set item_tags = data['references'][entity_name ~ "_tag"] %}
+            {% endif %}
+            <div class="box-body">
+            {% include 'twig_partials/detail/tags.twig' with {
+                'entity_name': entity_name,
+                'item_tags': item_tags,
+                'all_tags': referenced_entities_contents[entity_name ~ "_tag"]
+            }
+            %}
+            </div>
+        {% endif %}
 
         <div class="box-footer">
             <button type="submit" class="btn btn-primary">{{ locale['Save'] }}</button>

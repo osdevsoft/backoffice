@@ -37,3 +37,12 @@ $locale['create'] = 'creación';
 #sheet
 $locale['for this element'] = 'para este elemento';
 $locale['Save'] = 'Guardar';
+
+$locale['new tag'] = 'Nuevo tag';
+$locale['create tag'] = 'Crear tag';
+
+#common types
+$locale['static_pages.title'] = 'Título';
+$locale['static_pages.parent_id'] = 'Página padre';
+$locale['static_pages.seo_name'] = 'Nombre SEO';
+$locale['static_pages.content'] = 'Contenido';

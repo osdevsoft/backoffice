@@ -62,13 +62,18 @@ class DeleteEntityController extends BaseUIController
 
             #redirect to detail
             if (isset($result['items'][0]['deleted_id'])) {
-                UI::redirect($redirectUrl, "success", "delete_ok");
+                UI::redirect($redirectUrl, "success", "DELETE_OK");
             } else {
-                UI::redirect($redirectUrl, "danger", "delete_ko", $result['items'][0]['error_message']);
+                if(isset($result['items'][0]['error_message'])) {
+                    $error = $result['items'][0]['error_message'];
+                } else {
+                    $error = null;
+                }
+                UI::redirect($redirectUrl, "danger", "DELETE_KO", $error);
             }
         } catch(\Exception $e)
         {
-            UI::redirect($redirectUrl, "danger", "delete_ko", $e);
+            UI::redirect($redirectUrl, "danger", "DELETE_KO", $e);
         }
 
         return true;

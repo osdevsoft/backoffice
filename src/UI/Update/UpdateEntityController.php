@@ -2,6 +2,7 @@
 
 namespace Osds\Backoffice\UI\Update;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
@@ -57,7 +58,13 @@ class UpdateEntityController extends BaseUIController
 
             $messageObject = $this->getMessageObject($entity, $uuid, $requestParameters);
             $result = $this->commandBus->dispatch($messageObject);
-            
+
+            $this->lookForServerErrorsOnResponse($result);
+
+            if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+                return JsonResponse::create($result, 200);
+            }
+
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
                 UI::redirect($redirectUrl, "success", "EDIT_OK");
@@ -66,7 +73,7 @@ class UpdateEntityController extends BaseUIController
             }
         } catch(\Exception $e)
         {
-            UI::redirect($redirectUrl, "danger", "EDIT_KO", $e);
+            UI::redirect($redirectUrl,  "danger", "EDIT_KO", $e);
         }
 
         return true;
@@ -75,7 +82,11 @@ class UpdateEntityController extends BaseUIController
     
     private function getMessageObject($entity, $uuid, $requestParameters)
     {
-        
+        foreach($requestParameters as $key => $value) {
+            if(is_array($value)) {
+                $requestParameters[$key] = implode('%many%', $value);
+            }
+        }
         return new UpdateEntityCommand(
             $entity,
             $uuid,

@@ -164,12 +164,31 @@ class BaseUIController
             #we have referenced fields to display => we have to join them to recover them
             foreach ($config['backoffice']['entities'][$entity]['fields']['in_detail'] as $detailField) {
                 if (strstr($detailField, '.')) {
-                    $gatherEntities[] = preg_replace('/\.[^\.]*$/', '', $detailField);
+                    $fieldEntity = preg_replace('/\.[^\.]*$/', '', $detailField);
+                    $requestParameters['get']['referenced_entities'][] = $fieldEntity;
+                    if(in_array($detailField, $config['backoffice']['entities'][$entity]['fields']['fillable'])) {
+                        #we want to be able to modify it, so list all of them
+                        #TODO: ajax
+                        $requestParameters['get']['referenced_entities_contents'][] = $fieldEntity;
+                    }
                 }
             }
-            if (isset($gatherEntities)) {
-                $requestParameters['get']['referenced_entities'] = implode(',', $gatherEntities);
-                $requestParameters['get']['referenced_entities_contents'] = implode(',', $gatherEntities);
+            #additional referenced entities
+            if(isset($config['backoffice']['entities'][$entity]['referenced_entities'])) {
+                foreach($config['backoffice']['entities'][$entity]['referenced_entities'] as $referencedEntity => $referencedEntityInfo) {
+                    $requestParameters['get']['referenced_entities'][] = $referencedEntity;
+                    if(isset($referencedEntityInfo['all']) && $referencedEntityInfo['all'] == true) {
+                        $requestParameters['get']['referenced_entities_contents'][] = $referencedEntity;
+                    }
+                }
+            }
+
+            #implode per "," to send by url
+            if (isset($requestParameters['get']['referenced_entities']))     {
+                $requestParameters['get']['referenced_entities'] = implode(',', $requestParameters['get']['referenced_entities']);
+            }
+            if (isset($requestParameters['get']['referenced_entities_contents'])) {
+                $requestParameters['get']['referenced_entities_contents'] = implode(',', $requestParameters['get']['referenced_entities_contents']);
             }
         }
         return $requestParameters;

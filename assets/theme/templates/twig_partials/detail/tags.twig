@@ -1,0 +1,54 @@
+{% set item_tags_ids = item_tags|getFieldFromArray('uuid') %}
+<label>Tags</label>
+<a id="tag_add"> [+]</a>
+<div id="tag_add_form" style="display:none">
+    <fieldset class="ajax-form" data-action="/{{ entity_name }}_tag/create" data-method="post" data-callback="tag_created">
+        <input type="text" disabled="disabled" name="name" />
+        <button class="btn btn-primary" type="button">{{ locale['create tag'] }}</button>
+    </fieldset>
+</div>
+<input type="hidden" name="many_reference_{{ entity_name }}_tag.uuid[]" />
+<select id="tag_selector" name="many_reference_{{ entity_name }}_tag.uuid[]" class="form-control" multiple="multiple">
+    {% if all_tags.total_items is not defined %}
+        {% for tag in all_tags %}
+            <option
+                    value="{{ tag.uuid }}"
+                    {% if tag.uuid|in_array(item_tags_ids) %} selected="selected"{% endif %}
+            >
+                {{ tag.name }}
+            </option>
+        {% endfor %}
+    {% endif %}
+</select>
+
+<script>
+$("#tag_add").on('click', function() {
+   $("#tag_add_form").toggle();
+   // prevent of beign submitted with main form
+   $("#tag_add_form input").prop('disabled', function(i, v) { return !v; });
+});
+$("#tag_selector").select2({
+    tags: true
+});
+function tag_created(data) {
+    var tag_id = data.items[0]['upsert_id'];
+    var tag_name = $('#tag_add_form input[name="name"]').val();
+    $('#tag_selector').append('<option selected="selected" value="' + tag_id + '">' + tag_name + '</option>');
+    $("#tag_add").click();
+}
+
+
+$('fieldset.ajax-form button').on('click', function(e) {
+    e.preventDefault();
+    var $fieldset = $($(this).parent('fieldset'));
+    var fields = $fieldset.serialize();
+    $.ajax({
+        url: $fieldset.data('action'),
+        method: $fieldset.data('method'),
+        data: fields,
+        complete: function(response) {
+            tag_created(JSON.parse(response.responseText));
+        }
+    })
+})
+</script>

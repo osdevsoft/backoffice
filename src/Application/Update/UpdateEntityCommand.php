@@ -38,7 +38,6 @@ final class UpdateEntityCommand implements Command
             'post' => $this->requestParameters,
             'uri' => [$this->uuid]
             ];
-//        return $this->requestParameters;
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Osds\Backoffice\UI\Insert;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Osds\Backoffice\UI\BaseUIController;
 
@@ -60,6 +61,9 @@ class InsertEntityController extends BaseUIController
 
             $this->lookForServerErrorsOnResponse($result);
 
+            if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+                return JsonResponse::create($result, 200);
+            }
             #redirect to detail
             if (isset($result['items'][0]['upsert_id'])) {
                 UI::redirect($redirectUrl . $result['items'][0]['upsert_id'], "success", "CREATE_OK");
@@ -78,6 +82,11 @@ class InsertEntityController extends BaseUIController
     
     private function getEntityMessageObject($entity, $requestParameters)
     {
+        foreach($requestParameters as $key => $value) {
+            if(is_array($value)) {
+                $requestParameters[$key] = implode('%many%', $value);
+            }
+        }
         return new InsertEntityCommand(
             $entity,
             $requestParameters
