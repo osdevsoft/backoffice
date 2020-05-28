@@ -1,2 +1,3 @@
 imports:
   - ../../vendor/osds/backoffice/src/Infrastructure/Symfony/config/packages/osds/*
+  - ../../sites_configurations/sites/*/user/config/symfony/backoffice/services.yaml

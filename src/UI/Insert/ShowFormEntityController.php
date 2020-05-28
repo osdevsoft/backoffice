@@ -61,7 +61,7 @@ class ShowFormEntityController extends BaseUIController
 
         $this->setViewVariables($entity, $data);
 
-        $this->view->setTemplate('actions/create');
+        $this->view->setTemplate('actions/create.twig');
 
         $this->view->render();
 

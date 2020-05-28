@@ -6,6 +6,8 @@ namespace Osds\Backoffice\UI;
 use Osds\Auth\Infrastructure\UI\ServiceAuth;
 use Osds\Auth\Infrastructure\UI\StaticClass\Auth;
 use Osds\Auth\Infrastructure\UI\UserAuth;
+use Osds\Backoffice\Infrastructure\Helpers\Path;
+use Osds\DDDCommon\Infrastructure\Helpers\Server;
 use Osds\DDDCommon\Infrastructure\Persistence\SessionRepository;
 use Osds\DDDCommon\Infrastructure\View\ViewInterface;
 use Osds\Backoffice\Application\Localization\LoadLocalizationApplication;
@@ -202,6 +204,37 @@ class BaseUIController
         ) {
             $this->view->setVariable('alert_message', ['type' => 'error', 'message' => $data['error_message']]);
         }
+    }
+
+
+    protected function getTemplateContent($template, $entity, $data)
+    {
+        $templateSrc = '';
+
+        #which template to use?
+        #user templates path
+        $domainInfo = Server::getDomainInfo();
+        $siteTemplatesResourcesPath = Path::getPath('site_template_resources_path', $domainInfo['camelCaseId'], true) . 'templates/';
+        #check first for entity customized
+        $siteTemplate = $siteTemplatesResourcesPath . $entity . $template;
+        if(file_exists($siteTemplate)) {
+            $templateSrc = $siteTemplate;
+        } else {
+            $templateSrc = Path::getPath('templates', '', true) . $template;
+        }
+
+        $template = file_get_contents($templateSrc);
+        $vars_in_template = preg_match_all('/%(.*)%/', $template, $variables);
+        if(isset($variables[1]) && count($variables[1]) > 0) {
+            foreach($variables[1] as $var) {
+                if(isset($data[$var])) {
+                    $template = str_replace("%{$var}%", $data[$var], $template);
+                }
+            }
+        }
+        return $template;
+
+
     }
 
 }

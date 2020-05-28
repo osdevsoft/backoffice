@@ -12,8 +12,8 @@ class Tools
 
     public static function loadSiteConfiguration()
     {
-        $configuration_path = Path::getPath('sites_configurations', Server::getDomainInfo()['snakedId'], true);
-        $path_file = $configuration_path . 'backoffice.yml';
+        $configuration_path = Path::getPath('sites_configurations', Server::getDomainInfo()['camelCaseId'], true);
+        $path_file = $configuration_path . 'backoffice.yaml';
         if (!is_file($path_file)) {
             return false;
         }
@@ -23,7 +23,7 @@ class Tools
     public static function getTemplateJSForTinyMce()
     {
         $templateBlocksPath = $_SERVER['DOCUMENT_ROOT'] . '/../vendor/osds/template-blocks/assets/blocks/';
-        $backOfficecachePath = Path::getPath('backoffice_cache', Server::getDomainInfo()['snakedId'], true, true);
+        $backOfficecachePath = Path::getPath('backoffice_cache', Server::getDomainInfo()['camelCaseId'], true, true);
         $templateBlocksCacheFile = $backOfficecachePath . '/tinymce_definitions.json';
         if(
             file_exists($templateBlocksCacheFile)
@@ -58,7 +58,7 @@ class Tools
 
     public static function getStylesForTinyMce()
     {
-        $backOfficecachePath = Path::getPath('backoffice_cache', Server::getDomainInfo()['snakedId'], true);
+        $backOfficecachePath = Path::getPath('backoffice_cache', Server::getDomainInfo()['camelCaseId'], true);
         $blocks_defaults_styles = $backOfficecachePath . 'blocks_defaults.css';
         if(!file_exists($blocks_defaults_styles)
             || isset($_REQUEST['reloadOsdsCache'])) {
@@ -74,12 +74,12 @@ class Tools
                 $compiledScss = $scssCompiler->compile($scss);
                 #minimize
                 $compiledScss = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $compiledScss);
-                $destinyFile = Path::getPath('backoffice_cache', Server::getDomainInfo()['snakedId'], true);
+                $destinyFile = Path::getPath('backoffice_cache', Server::getDomainInfo()['camelCaseId'], true);
                 file_put_contents($destinyFile . 'blocks_defaults.css', $compiledScss);
 
         }
 
-        return Path::getPath('public', Server::getDomainInfo()['snakedId']);
+        return Path::getPath('public', Server::getDomainInfo()['camelCaseId']);
     }
 
     public static function rglob($pattern, $flags = 0) {

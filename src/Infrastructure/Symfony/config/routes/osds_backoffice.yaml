@@ -2,3 +2,6 @@
 osds_backoffice:
   resource: '../../vendor/osds/backoffice/src/UI/'
   type:     annotation
+
+osds_backoffice_sites:
+  resource: '../../sites_configurations/sites/*/user/config/symfony/backoffice/routes.yaml'

@@ -40,7 +40,7 @@ class ShowLoginFormController extends BaseUIController
      */
     public function handle()
     {
-        $this->view->setTemplate('session/login');
+        $this->view->setTemplate('session/login.twig');
         return $this->view->render();
     }
 

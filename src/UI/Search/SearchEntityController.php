@@ -55,7 +55,7 @@ class SearchEntityController extends BaseUIController
 
         $this->setViewVariables($entity, $data);
 
-        $this->view->setTemplate('actions/list');
+        $this->view->setTemplate('actions/list.twig');
         $this->view->render();
 
     }

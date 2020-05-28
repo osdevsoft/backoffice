@@ -64,7 +64,7 @@ class FindEntityController extends BaseUIController
 
         $this->setViewVariables($entity, $data);
 
-        $this->view->setTemplate('actions/detail');
+        $this->view->setTemplate('actions/detail.twig');
 
         $this->view->render();
 
@@ -110,6 +110,13 @@ class FindEntityController extends BaseUIController
 
         $this->view->setVariable('theme_style_sheet', Tools::getStylesForTinyMce());
         $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
+
+
+        #do we have custom actions?
+        $entity_detail_actions = $this->getTemplateContent('/twig_partials/detail/actions.twig', $entity, $data['items'][0]);
+        $this->view->setVariable('entity_detail_actions', $entity_detail_actions);
+
+
     }
 
 

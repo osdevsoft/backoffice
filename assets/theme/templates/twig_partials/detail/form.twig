@@ -20,8 +20,12 @@
 
 
 <div class="box box-primary">
+    {% if entity_detail_actions is defined %}
+        {{ entity_detail_actions|raw }}
+    {% endif %}
+
     <div class="box-header with-border">
-        <h3 class="box-title">Content</h3>
+        <h3 class="box-title">Contenido</h3>
     </div>
 
     <form id="detail_submit" action="{{ form_action }}" method="post" enctype="multipart/form-data" role="form">
