@@ -111,10 +111,11 @@ function getFilesPath(){
 // from vendor/osds/ddd-common/src/Infrastructure/Helpers/Server
 function getDomainInfo()
 {
-    $requestOrigin = str_replace($_SERVER['REQUEST_SCHEME'] . '://', '', $_SERVER['HTTP_HOST']);
+    $requestScheme = (isset($_SERVER['REQUEST_SCHEME']))?$_SERVER['REQUEST_SCHEME']:'http';
+    $requestOrigin = str_replace($requestScheme . '://', '', $_SERVER['HTTP_HOST']);
 
     $domainData = [
-        'protocol' => $_SERVER['REQUEST_SCHEME'],
+        'protocol' => $requestScheme,
         'requestOrigin' => $requestOrigin,
         'mainDomain' => '',
         'snakedId' => ''

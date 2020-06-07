@@ -69,7 +69,8 @@ class UpdateEntityController extends BaseUIController
             if (isset($result['items'][0]['upsert_id'])) {
                 UI::redirect($redirectUrl, "success", "EDIT_OK");
             } else {
-                UI::redirect($redirectUrl, "danger", "EDIT_KO", $result['items'][0]['error_message']);
+                $message = isset($result['items'][0]['error_message'])?$result['items'][0]['error_message']:'';
+                UI::redirect($redirectUrl, "danger", "EDIT_KO", $message);
             }
         } catch(\Exception $e)
         {

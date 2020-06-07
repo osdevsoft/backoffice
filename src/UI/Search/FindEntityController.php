@@ -109,7 +109,7 @@ class FindEntityController extends BaseUIController
         $this->view->setVariable('entities_metadata', $this->config['backoffice']['entities']);
 
         $this->view->setVariable('theme_style_sheet', Tools::getStylesForTinyMce());
-        $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
+//        $this->view->setVariable('theme_blocks_json', Tools::getTemplateJSForTinyMce());
 
 
         #do we have custom actions?

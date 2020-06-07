@@ -18,6 +18,13 @@ $locale['EDIT_KO'] = 'Hubo un ERROR al actualizar el contenido: ';
 $locale['DELETE_OK'] = 'Contenido eliminado correctamente';
 $locale['DELETE_KO'] = 'Hubo un ERROR al eliminar el contenido: ';
 
+$locale['Server Error'] = 'Ha habido un ERROR al realizar la solicitud';
+
+#navigators
+$locale['online'] = 'Activo';
+$locale['main_navigation'] = 'Secciones';
+$locale['sign_out'] = 'Salir';
+
 #list
 $locale['Search'] = 'Buscar';
 $locale['Find'] = 'Encontrar';

@@ -56,7 +56,8 @@ class PostLoginFormController extends BaseUIController
         );
 
         if ($authUser != null) {
-            UI::redirect('/static_page');
+            $main_entity = $this->config['backoffice']['main_entity'];
+            UI::redirect('/' . $main_entity);
         } else {
             UI::redirect(self::PAGES['session']['login'], 'danger', 'login_ko');
         }
